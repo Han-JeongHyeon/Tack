@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.content.Context
 import android.util.Log
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.bumptech.glide.Glide
 
 class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
+//    var datas = SparseArray<DateClassTest>()
     var datas = mutableListOf<DateClassTest>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,9 +34,10 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_photo)
 
         fun bind(item: DateClassTest) {
-            fishname.text = "이름 : ${item.name.substring(0,item.name.indexOf("/"))}"
-            fishprice.text = "가격 : ${item.name.substring(item.name.indexOf("@")+1)}원"
-            Glide.with(itemView).load(item.name.substring(item.name.indexOf("/")+1,item.name.indexOf("@"))).into(imgProfile)
+//            Log.d("TAG", "${item.name}")
+            fishname.text = "이름 : ${item.name}"
+            fishprice.text = "가격 : ${item.price}원"
+            Glide.with(itemView).load(item.image).into(imgProfile)
         }
     }
 }

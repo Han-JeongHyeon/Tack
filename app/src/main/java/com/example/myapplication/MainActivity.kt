@@ -31,9 +31,10 @@ class MainActivity : AppCompatActivity() {
     //어뎁터 연결
     lateinit var profileAdapter: Adapter
     val datas = mutableListOf<DateClassTest>()
+//    val datas = SparseArray<DateClassTest>()
 
     //SparseArray
-    var name_arr : SparseArray<String>? = null
+    var name_arr : SparseArray<DateClassTest>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             .addConverterFactory(GsonConverterFactory.create()).build();
         val service = retrofit.create(FishName_interface::class.java);
 
-        name_arr = SparseArray(0)
+        name_arr = SparseArray<DateClassTest>()
 
         for (i in 1..80) {
             service.getName("$i").enqueue(object: Callback<FishName>{
@@ -61,25 +62,34 @@ class MainActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
                     var result: FishName? = response.body()
                     //Array에 값 저장
-                    name_arr?.append(i,"${result?.name?.KRko}/${result?.image}@${result?.price}")
-                    //마지막 데이터가 있는지 체크
-                    if (name_arr?.get(80) != null) {
-                        RecyclerV()
+                    name_arr?.append(i,
+                        DateClassTest(
+                        "${result?.name?.KRko}",
+                        "${result?.price}",
+                        "${result?.image}"
+                        )
+                    )
+                    if (name_arr?.size() == 80) {
+                        addDataToRecyclerView()
                     }
                 }
             })
         }
     }
 
-    //RecyclerView에 추가하기
-    private fun RecyclerV() {
+    private fun addDataToRecyclerView() {
         for (i in 1..80) {
-            Log.d("TAG", "${name_arr?.get(i)}")
             datas.apply {
-                add(DateClassTest("${name_arr?.get(i)}"))
+                add(
+                    DateClassTest(
+                        "${name_arr?.get(i)?.name}",
+                        "${name_arr?.get(i)?.price}",
+                        "${name_arr?.get(i)?.image}"
+                    )
+                )
+                profileAdapter.datas = datas
             }
-            profileAdapter.datas = datas
-            profileAdapter.notifyDataSetChanged()
         }
+        profileAdapter.notifyDataSetChanged()
     }
 }
