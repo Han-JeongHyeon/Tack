@@ -25,26 +25,31 @@ import kotlin.random.nextInt
 
 class MainActivity : AppCompatActivity() {
 
+    //뷰 바인딩
     private lateinit var binding: ActivityMainBinding
 
+    //어뎁터 연결
     lateinit var profileAdapter: Adapter
     val datas = mutableListOf<DateClassTest>()
 
-    var name_aar : SparseArray<String>? = null
+    //SparseArray
+    var name_arr : SparseArray<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //RecyclerView 연결
         profileAdapter = Adapter(this)
         binding.Recycler.adapter = profileAdapter
 
+        //retrofit 설장
         val retrofit = Retrofit.Builder().baseUrl("https://acnhapi.com/v1/")
             .addConverterFactory(GsonConverterFactory.create()).build();
         val service = retrofit.create(FishName_interface::class.java);
 
-        name_aar = SparseArray(0)
+        name_arr = SparseArray(0)
 
         for (i in 1..80) {
             service.getName("$i").enqueue(object: Callback<FishName>{
@@ -55,8 +60,10 @@ class MainActivity : AppCompatActivity() {
                 //api 요청 성공 처리
                 override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
                     var result: FishName? = response.body()
-                    name_aar?.append(i,"${result?.name?.KRko}/${result?.image}@${result?.price}")
-                    if (name_aar?.get(80) != null) {
+                    //Array에 값 저장
+                    name_arr?.append(i,"${result?.name?.KRko}/${result?.image}@${result?.price}")
+                    //마지막 데이터가 있는지 체크
+                    if (name_arr?.get(80) != null) {
                         RecyclerV()
                     }
                 }
@@ -64,11 +71,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //RecyclerView에 추가하기
     private fun RecyclerV() {
         for (i in 1..80) {
-            Log.d("TAG", "${name_aar?.get(i)}")
+            Log.d("TAG", "${name_arr?.get(i)}")
             datas.apply {
-                add(DateClassTest("${name_aar?.get(i)}"))
+                add(DateClassTest("${name_arr?.get(i)}"))
             }
             profileAdapter.datas = datas
             profileAdapter.notifyDataSetChanged()
