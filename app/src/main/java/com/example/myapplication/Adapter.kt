@@ -34,7 +34,6 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_photo)
 
         fun bind(item: DateClassTest) {
-//            Log.d("TAG", "${item.name}")
             fishname.text = "이름 : ${item.name}"
             fishprice.text = "가격 : ${item.price}원"
             Glide.with(itemView).load(item.image).into(imgProfile)
