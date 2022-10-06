@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="btn1">+</string>
+    <string name="btn2">-</string>
+    <string name="btn3">*</string>
+    <string name="btn4">/</string>
+    <string name="btn5">%</string>
+</resources>
