@@ -32,11 +32,9 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_photo)
 
         fun bind(item: DateClassTest) {
-            fishname.text = "이름 : ${item.name}"
-            fishprice.text = "가격 : ${item.price}원"
-            Glide.with(itemView).load(item.image).into(imgProfile)
+            fishname.text = "이름 : ${item.name.substring(0,item.name.indexOf("/"))}"
+            fishprice.text = "가격 : ${item.name.substring(item.name.indexOf("@")+1)}원"
+            Glide.with(itemView).load(item.name.substring(item.name.indexOf("/")+1,item.name.indexOf("@"))).into(imgProfile)
         }
     }
 }
-
-//{"bitterling":{"

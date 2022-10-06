@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.util.SparseArray
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -29,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var profileAdapter: Adapter
     val datas = mutableListOf<DateClassTest>()
 
+    var name_aar : SparseArray<String>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -41,6 +44,8 @@ class MainActivity : AppCompatActivity() {
             .addConverterFactory(GsonConverterFactory.create()).build();
         val service = retrofit.create(FishName_interface::class.java);
 
+        name_aar = SparseArray(0)
+
         for (i in 1..80) {
             service.getName("$i").enqueue(object: Callback<FishName>{
                 //api 요청 실패 처리
@@ -50,17 +55,23 @@ class MainActivity : AppCompatActivity() {
                 //api 요청 성공 처리
                 override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
                     var result: FishName? = response.body()
-                    datas.apply {
-                        add(DateClassTest("${result?.name?.KRko}","${result?.image}","${result?.price}"))
+                    name_aar?.append(i,"${result?.name?.KRko}/${result?.image}@${result?.price}")
+                    if (name_aar?.get(80) != null) {
+                        RecyclerV()
                     }
-                    profileAdapter.datas = datas
-                    profileAdapter.notifyDataSetChanged()
                 }
             })
-
-            Thread.sleep(100)
-
         }
+    }
 
+    private fun RecyclerV() {
+        for (i in 1..80) {
+            Log.d("TAG", "${name_aar?.get(i)}")
+            datas.apply {
+                add(DateClassTest("${name_aar?.get(i)}"))
+            }
+            profileAdapter.datas = datas
+            profileAdapter.notifyDataSetChanged()
+        }
     }
 }
