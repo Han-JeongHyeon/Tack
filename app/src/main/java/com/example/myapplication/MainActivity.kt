@@ -69,10 +69,10 @@ class MainActivity : AppCompatActivity() {
 
         var j = 0
 
-        reqcnt=0
+//        reqcnt=0
         if (datas.size == 0) {
             for (i in 1..80) {
-                service.getName("${i+1}").enqueue(object: Callback<FishName>{
+                service.getName("${i}").enqueue(object: Callback<FishName>{
                     //api 요청 실패 처리
                     override fun onFailure(call: Call<FishName>, t: Throwable) {
                         Log.d("Error", ""+t.toString())
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                         var result: FishName? = response.body()
                         //Array에 값 저장
                         if(i % 2 == 0){
-
+                            j++
                         }
                         else{
                             var query = "INSERT INTO animals('num','name','price','image') values('${i}','${result?.name?.KRko}','${result?.price}','${result?.image}');"
