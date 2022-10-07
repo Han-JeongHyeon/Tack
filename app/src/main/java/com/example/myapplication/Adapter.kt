@@ -13,8 +13,8 @@ import com.bumptech.glide.Glide
 
 class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
-    var datas = SparseArray<DateClassTest>()
-//    var datas = mutableListOf<DateClassTest>()
+//    var datas = SparseArray<DateClassTest>()
+    var datas = mutableListOf<DateClassTest>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
@@ -22,10 +22,15 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
         return ViewHolder(view)
     }
 
-    override fun getItemCount(): Int = datas.size()
+    override fun getItemCount(): Int = datas.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(datas[position])
+//        if(position % 2 == 0){
+//            holder.bind(datas[position])
+//        }
+//        else{
+            holder.bind(datas[position])
+//        }
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -34,6 +39,7 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_photo)
 
         fun bind(item: DateClassTest) {
+//            Log.d("TAG", "${position}")
             fishname.text = "이름 : ${item.name}"
             fishprice.text = "가격 : ${item.price}원"
             Glide.with(itemView).load(item.image).into(imgProfile)
