@@ -13,8 +13,8 @@ import com.bumptech.glide.Glide
 
 class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
-//    var datas = SparseArray<DateClassTest>()
-    var datas = mutableListOf<DateClassTest>()
+    var datas = SparseArray<DateClassTest>()
+//    var datas = mutableListOf<DateClassTest>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
@@ -22,7 +22,7 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
         return ViewHolder(view)
     }
 
-    override fun getItemCount(): Int = datas.size
+    override fun getItemCount(): Int = datas.size()
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(datas[position])
