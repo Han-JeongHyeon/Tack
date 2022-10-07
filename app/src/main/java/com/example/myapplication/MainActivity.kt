@@ -52,61 +52,82 @@ class MainActivity : AppCompatActivity() {
         dbHelper = SqliteHelper(this, "fishName.db", null, 1)
         database = dbHelper.writableDatabase
 
-        //retrofit 설장
-        val retrofit = Retrofit.Builder().baseUrl("https://acnhapi.com/v1/")
-            .addConverterFactory(GsonConverterFactory.create()).build();
-        val service = retrofit.create(FishName_interface::class.java);
-
         nameArray = SparseArray<DateClassTest>()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            var query = "SELECT * FROM animals ORDER BY num asc;"
-            var cursor = database.rawQuery(query, null)
-            if(cursor.count == 0){
-                for (i in 0 until 80) {
-                    service.getName("${i + 1}").enqueue(object: Callback<FishName>{
-                        //api 요청 실패 처리
-                        override fun onFailure(call: Call<FishName>, t: Throwable) {
-                            Log.d("Error", ""+t.toString())
-                        }
-                        //api 요청 성공 처리
-                        override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
-                            var result: FishName? = response.body()
-                            //Array에 값 저장
-                            var query = "INSERT INTO animals('num','name','price','image') values('${i}','${result?.name?.KRko}','${result?.price}','${result?.image}');"
-                            database.execSQL(query)
-                            nameArray?.append(i,DateClassTest("${result?.name?.KRko}","${result?.price}","${result?.image}"))
-                            if (nameArray?.size() == 80) {
-                                addDataToRecyclerView()
-                            }
-                        }
-                    })
-                }
-            }
-            else{
-                while(cursor.moveToNext()){
-                    var num = cursor.getString(cursor.getColumnIndex("num"))
-                    var name = cursor.getString(cursor.getColumnIndex("name"))
-                    var price = cursor.getString(cursor.getColumnIndex("price"))
-                    var image = cursor.getString(cursor.getColumnIndex("image"))
-                    nameArray?.append(num.toInt(),DateClassTest(name,price,image))
-                    if (nameArray?.size() == 80) {
-                        addDataToRecyclerView()
-                    }
-                }
-            }
-        }
 
 //        var query = "DELETE FROM animals;"
 //        database.execSQL(query)
 
+        asyncTask.execute()
+
     }
 
-    @SuppressLint("Range")
+    val asyncTask = object : AsyncTask<Void, Int, String>() {
+        @SuppressLint("Range")
+        override fun doInBackground(vararg params: Void?): String {
+            val retrofit = Retrofit.Builder().baseUrl("https://acnhapi.com/v1/")
+                .addConverterFactory(GsonConverterFactory.create()).build();
+            val service = retrofit.create(FishName_interface::class.java);
+
+            CoroutineScope(Dispatchers.IO).launch {
+                var query = "SELECT * FROM animals ORDER BY num asc;"
+                var cursor = database.rawQuery(query, null)
+                if(cursor.count == 0){
+                    for (i in 0 until 80) {
+                        service.getName("${i + 1}").enqueue(object: Callback<FishName>{
+                            //api 요청 실패 처리
+                            override fun onFailure(call: Call<FishName>, t: Throwable) {
+                                Log.d("Error", ""+t.toString())
+                            }
+                            //api 요청 성공 처리
+                            override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
+                                var result: FishName? = response.body()
+                                //Array에 값 저장
+                                var query = "INSERT INTO animals('num','name','price','image') values('${i}','${result?.name?.KRko}','${result?.price}','${result?.image}');"
+                                database.execSQL(query)
+                                nameArray?.append(i,DateClassTest("${result?.name?.KRko}","${result?.price}","${result?.image}"))
+                                if (nameArray?.size() == 80) {
+                                    addDataToRecyclerView()
+                                }
+                            }
+                        })
+                    }
+                }
+                else{
+                    while(cursor.moveToNext()){
+                        var num = cursor.getString(cursor.getColumnIndex("num"))
+                        var name = cursor.getString(cursor.getColumnIndex("name"))
+                        var price = cursor.getString(cursor.getColumnIndex("price"))
+                        var image = cursor.getString(cursor.getColumnIndex("image"))
+                        nameArray?.append(num.toInt(),DateClassTest(name,price,image))
+                        if (nameArray?.size() == 80) {
+                            addDataToRecyclerView()
+                        }
+                    }
+                }
+            }
+
+            return "완료"
+        }
+
+        override fun onProgressUpdate(vararg values: Int?) {
+            super.onProgressUpdate(*values)
+
+            binding.text.text = "${values[0]!!}"
+        }
+
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            nameArray?.let {
+                fishAdapter.datas = it
+                fishAdapter.notifyDataSetChanged()
+            }
+        }
+    }
+
     private fun addDataToRecyclerView() {
         nameArray?.let {
             fishAdapter.datas = it
-            fishAdapter.notifyDataSetChanged()
         }
+        fishAdapter.notifyDataSetChanged()
     }
 }
