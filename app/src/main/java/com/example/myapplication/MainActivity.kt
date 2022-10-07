@@ -1,9 +1,12 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
+import android.database.sqlite.SQLiteDatabase
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
+import android.widget.Toast
 import com.example.myapplication.databinding.ActivityMainBinding
 import org.w3c.dom.Text
 import retrofit2.Call
@@ -27,6 +30,10 @@ class MainActivity : AppCompatActivity() {
     //SparseArray
     var nameArray : SparseArray<DateClassTest>? = null
 
+    lateinit var dbHelper: SqliteHelper
+    lateinit var database: SQLiteDatabase
+
+    @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -36,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         fishAdapter = Adapter(this)
         binding.Recycler.adapter = fishAdapter
 
+        dbHelper = SqliteHelper(this, "fishName.db", null, 1)
+        database = dbHelper.writableDatabase
+
         //retrofit 설장
         val retrofit = Retrofit.Builder().baseUrl("https://acnhapi.com/v1/")
             .addConverterFactory(GsonConverterFactory.create()).build();
@@ -43,31 +53,48 @@ class MainActivity : AppCompatActivity() {
 
         nameArray = SparseArray<DateClassTest>()
 
-        for (i in 0 until 80) {
-            service.getName("${i + 1}").enqueue(object: Callback<FishName>{
-                //api 요청 실패 처리
-                override fun onFailure(call: Call<FishName>, t: Throwable) {
-                    Log.d("Error", ""+t.toString())
-                }
-                //api 요청 성공 처리
-                override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
-                    var result: FishName? = response.body()
-                    //Array에 값 저장
-                    nameArray?.append(i,
-                        DateClassTest(
-                        "${result?.name?.KRko}",
-                        "${result?.price}",
-                        "${result?.image}"
-                        )
-                    )
-                    if (nameArray?.size() == 80) {
-                        addDataToRecyclerView()
+        var query = "SELECT * FROM animals ORDER BY num asc;"
+        var cursor = database.rawQuery(query, null)
+        if(cursor.count == 0){
+            for (i in 0 until 80) {
+                service.getName("${i + 1}").enqueue(object: Callback<FishName>{
+                    //api 요청 실패 처리
+                    override fun onFailure(call: Call<FishName>, t: Throwable) {
+                        Log.d("Error", ""+t.toString())
                     }
-                }
-            })
+                    //api 요청 성공 처리
+                    override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
+                        var result: FishName? = response.body()
+                        //Array에 값 저장
+                        var query = "INSERT INTO animals('num','name','price','image') values('${i}','${result?.name?.KRko}','${result?.price}','${result?.image}');"
+                        database.execSQL(query)
+                        nameArray?.append(i,DateClassTest("${result?.name?.KRko}","${result?.price}","${result?.image}"))
+                        if (nameArray?.size() == 80) {
+                            addDataToRecyclerView()
+                        }
+                    }
+                })
+            }
         }
+        else{
+            while(cursor.moveToNext()){
+                var num = cursor.getString(cursor.getColumnIndex("num"))
+                var name = cursor.getString(cursor.getColumnIndex("name"))
+                var price = cursor.getString(cursor.getColumnIndex("price"))
+                var image = cursor.getString(cursor.getColumnIndex("image"))
+                nameArray?.append(num.toInt(),DateClassTest(name,price,image))
+                if (nameArray?.size() == 80) {
+                    addDataToRecyclerView()
+                }
+            }
+        }
+
+//        var query = "DELETE FROM animals;"
+//        database.execSQL(query)
+
     }
 
+    @SuppressLint("Range")
     private fun addDataToRecyclerView() {
         nameArray?.let {
             fishAdapter.datas = it

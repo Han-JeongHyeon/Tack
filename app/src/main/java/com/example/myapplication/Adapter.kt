@@ -25,6 +25,7 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
     override fun getItemCount(): Int = datas.size()
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        Log.d("TAG", "$position ${datas[position]}")
         holder.bind(datas[position])
     }
 
