@@ -14,7 +14,7 @@ class SqliteHelper(
 ): SQLiteOpenHelper(context, name, factory, version){
     override fun onCreate(db: SQLiteDatabase) {
         var sql: String = "CREATE TABLE if not exists animals(" +
-                "num text primary key," +
+                "num int primary key," +
                 "name text," +
                 "price text," +
                 "image text);"

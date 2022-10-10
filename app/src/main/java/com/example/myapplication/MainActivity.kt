@@ -40,7 +40,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var dbHelper: SqliteHelper
     lateinit var database: SQLiteDatabase
 
-    var strList =  ArrayList<String>();
+    var numCheckList =  ArrayList<String>()
+    var numList =  ArrayList<String>()
 
     @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,11 +53,17 @@ class MainActivity : AppCompatActivity() {
         fishAdapter = Adapter(this)
         binding.Recycler.adapter = fishAdapter
 
-        dbHelper = SqliteHelper(this, "fishName.db", null, 1)
+        dbHelper = SqliteHelper(this, "FishName.db", null, 1)
         database = dbHelper.writableDatabase
+
 
 //        var query = "delete from animals;"
 //        database.execSQL(query)
+
+//        for (i in 0 until 80) {
+//            arr?.append(i, "${i + 1}")
+//            Log.d("TAG", "asdasdasdsdaaa")
+//        }
 
         asyncTask.execute()
 
@@ -99,8 +106,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
         else{
-            for (i in 0 until strList.size) {
-                service.getName("${strList.get(i)}").enqueue(object: Callback<FishName>{
+            Log.d("TAG", "2132132 ${numCheckList.size}")
+            for (i in 0 until numCheckList.size) {
+                service.getName("${numCheckList.get(i)}").enqueue(object: Callback<FishName>{
                     //api 요청 실패 처리
                     override fun onFailure(call: Call<FishName>, t: Throwable) {
                         Log.d("Error", ""+t.toString())
@@ -108,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                     //api 요청 성공 처리
                     override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
                         var result: FishName? = response.body()
-                            var query = "update animals set name = '${result?.name?.KRko}', price = '${result?.price}', image = '${result?.image}' where num = '${strList.get(i)}';"
+                            var query = "INSERT INTO animals('num','name','price','image') values('${numCheckList.get(i)}','${result?.name?.KRko}','${result?.price}','${result?.image}');"
                             database.execSQL(query)
                             datas.apply {
                                 add(DateClassTest("${result?.name?.KRko}","${result?.price}","${result?.image}"))
@@ -125,20 +133,33 @@ class MainActivity : AppCompatActivity() {
 
     val asyncTask = object : AsyncTask<Void, Int, MutableList<DateClassTest>>() {
 
+        var numCheck = 1
+
         @SuppressLint("Range")
         override fun doInBackground(vararg params: Void?): MutableList<DateClassTest> {
-            var query = "SELECT * FROM animals ORDER BY num asc;"
+            Log.d("TAG", "doInBackground1")
+            var query = "SELECT * FROM animals order by num;"
             var cursor = database.rawQuery(query, null)
             while(cursor.moveToNext()){
-                var num = cursor.getString(cursor.getColumnIndex("num"))
+                var num = cursor.getInt(cursor.getColumnIndex("num"))
                 var name = cursor.getString(cursor.getColumnIndex("name"))
                 var price = cursor.getString(cursor.getColumnIndex("price"))
                 var image = cursor.getString(cursor.getColumnIndex("image"))
-                if (name != "null") {
-                    datas.add(DateClassTest("${name}","${price}","${image}"))
-                }
-                else{
-                    strList.add("${num.toInt()-1}")
+                datas.add(DateClassTest("${name}","${price}","${image}"))
+
+//                numCheckList.add("$num")
+
+                forEnd@ for (i in numCheck..80) {
+                    if(num == i){
+                        numCheck = num + 1
+                        break@forEnd
+                    }
+                    else{
+                        numCheckList.add("$i")
+                    }
+                    if(datas.size == 40 && i != 80){
+                        numCheckList.add("80")
+                    }
                 }
             }
 
@@ -162,12 +183,12 @@ class MainActivity : AppCompatActivity() {
            }
         }
         else if (result.size <= 79){
+            addDataToRecyclerView(result)
             apiCallBack {
                 addDataToRecyclerView(it)
             }
         }
         else{
-            Log.d("TAG", "setRecyclerView")
             addDataToRecyclerView(result)
         }
     }
