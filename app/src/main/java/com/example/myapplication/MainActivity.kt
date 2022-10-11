@@ -9,10 +9,7 @@ import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
 import com.example.myapplication.databinding.ActivityMainBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.w3c.dom.Text
 import retrofit2.Call
 import retrofit2.Callback
@@ -49,8 +46,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun api(numPosition : Int) {
-        var j = 0
-
         val retrofit = Retrofit.Builder().baseUrl("https://acnhapi.com/v1/")
             .addConverterFactory(GsonConverterFactory.create()).build()
         val service = retrofit.create(FishName_interface::class.java)
@@ -63,9 +58,7 @@ class MainActivity : AppCompatActivity() {
             //api 요청 성공 처리
             override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
                 var result: FishName? = response.body()
-                if(java.util.Random().nextInt(10) + 1 == 1){
-                    j++
-                }
+                if(java.util.Random().nextInt(10) + 1 == 1)
                 else{
                     var query = "INSERT INTO animals('num','name','price','image') values('${numPosition}','${result?.name?.KRko}','${result?.price}','${result?.image}')"
                     database.execSQL(query)
@@ -75,7 +68,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-
     }
 
     val asyncTask = object : AsyncTask<Void, Int, MutableList<DateClassTest>>() {
@@ -92,27 +84,19 @@ class MainActivity : AppCompatActivity() {
                 var price = cursor.getString(cursor.getColumnIndex("price"))
                 var image = cursor.getString(cursor.getColumnIndex("image"))
 
-                forBreak@ for (i in numCheck..80) {
-                    if(num == i){
-                        numCheck = num + 1
-                        datas.add(DateClassTest("$name","$price","$image"))
-                        break@forBreak
-                    }
-                    else{
-                        api(i)
-                    }
-                    if(datas.size == 40 && i != 80){
-                        api(80)
-                    }
-                }
+                for (i in numCheck until num) { api(i) }
+
+                numCheck = num + 1
+
+                datas.add(DateClassTest("$name","$price","$image"))
+            }
+
+            if (numCheck != 81 && datas.size != 0) {
+                for (i in numCheck..80) { api(i) }
             }
 
             if (datas.size == 0) {
-                var i = 1
-                while (i <= 80){
-                    api(i)
-                    i++
-                }
+                for (i in 1..80) api(i)
             }
 
             return datas

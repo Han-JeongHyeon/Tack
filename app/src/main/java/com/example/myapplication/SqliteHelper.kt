@@ -16,7 +16,7 @@ class SqliteHelper(
         var sql: String = "CREATE TABLE if not exists animals(" +
                 "num int primary key," +
                 "name text," +
-                "price text," +
+                "price int," +
                 "image text);"
 
         db.execSQL(sql)
