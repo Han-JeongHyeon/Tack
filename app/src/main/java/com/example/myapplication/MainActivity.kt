@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var fishAdapter: Adapter
     val datas = mutableListOf<DateClassTest>()
+    val datas1 = mutableListOf<DateClassTest>()
 
     lateinit var dbHelper: SqliteHelper
     lateinit var database: SQLiteDatabase
@@ -45,14 +46,25 @@ class MainActivity : AppCompatActivity() {
         dbHelper = SqliteHelper(this, "FishName.db", null, 1)
         database = dbHelper.writableDatabase
 
-        asyncTask.execute()
+        binding.btn.setOnClickListener{
+            val start = fishAdapter.datas[0].num / pageSize
+            val end = fishAdapter.datas.size
+            fishAdapter.datas.clear()
+            fishAdapter.notifyDataSetChanged()
+            var asyncTack = AsyncTack(this, start, end)
+            val dbValue = asyncTack.execute()
+
+            setRecyclerView(dbValue.get())
+        }
+
+        api()
 
         binding.Recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 // 스크롤이 끝에 도달했는지 확인
                 if (!binding.Recycler.canScrollVertically(1)) {
-//                    page++
+                    page++
                     api()
                 }
             }
@@ -61,6 +73,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun api() {
+        if (page * pageSize + pageSize > 80){
+            return
+        }
+
+        var asyncTack = AsyncTack(this, page, pageSize)
+        val dbValue = asyncTack.execute()
+
+        val requiredIds = ((page * pageSize)+1..(page * pageSize + pageSize)).toList()
+        val requestIds = requiredIds.minus(dbValue.get().map { it.num }.toSet())
+
         var requestCnt = 0
         var requestCnt1 = 0
 
@@ -68,13 +90,12 @@ class MainActivity : AppCompatActivity() {
             .addConverterFactory(GsonConverterFactory.create()).build()
         val service = retrofit.create(FishName_interface::class.java)
 
-        val requiredIds = ((page * pageSize)+1..(page * pageSize + 20)).toList()
-        val requestIds = requiredIds.minus(datas.map { it.num }.toSet())
-
-        if (requestIds.isEmpty()) {
-            setRecyclerView(datas)
+        if (requestIds.isEmpty() && fishAdapter.datas.size + dbValue.get().size == page * pageSize + pageSize) {
+            setRecyclerView(dbValue.get())
             return
         }
+
+        setRecyclerView(dbValue.get())
 
         for (id in requestIds) {
             service.getName("${id}").enqueue(object: Callback<FishName>{
@@ -90,44 +111,17 @@ class MainActivity : AppCompatActivity() {
                         var query = "INSERT INTO animals('num','name','price','image') values('${id}','${result?.name?.KRko}','${result?.price}','${result?.image}')"
                         database.execSQL(query)
                         requestCnt1++
-                        datas.apply {
+                        datas1.apply {
                             add(DateClassTest(id,"${result?.name?.KRko}","${result?.price}","${result?.image}"))
                         }
                     }
                     if (requestCnt1+requestCnt == requestIds.size) {
-                        setRecyclerView(datas)
+                        setRecyclerView(datas1)
                     }
                 }
             })
         }
 
-    }
-
-    val asyncTask = object : AsyncTask<Void, Int, Void?>() {
-
-        @SuppressLint("Range")
-        override fun doInBackground(vararg params: Void?): Void? {
-            var query = "SELECT * FROM animals order by num limit ${page * pageSize}, $pageSize;"
-            var cursor = database.rawQuery(query, null)
-            while(cursor.moveToNext()){
-                var num = cursor.getInt(cursor.getColumnIndex("num"))
-                var name = cursor.getString(cursor.getColumnIndex("name"))
-                var price = cursor.getString(cursor.getColumnIndex("price"))
-                var image = cursor.getString(cursor.getColumnIndex("image"))
-
-                datas.add(DateClassTest(num, "$name","$price","$image"))
-            }
-            return null
-        }
-
-        override fun onProgressUpdate(vararg values: Int?) {
-            super.onProgressUpdate(*values)
-        }
-
-        override fun onPostExecute(void: Void?) {
-            super.onPostExecute(void)
-            api()
-        }
     }
 
     fun setRecyclerView(result : MutableList<DateClassTest>) {
@@ -136,11 +130,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun addDataToRecyclerView(result : MutableList<DateClassTest>) {
         val prevSize = fishAdapter.datas.size
-        Log.d("TAG", "asd1 ${prevSize}")
         result?.let {
             fishAdapter.datas.addAll(it)
         }
-        Log.d("TAG", "asd2 ${result.size-prevSize*1}")
-        fishAdapter.notifyItemRangeInserted(prevSize, result.size-prevSize*1)
+        fishAdapter.notifyItemRangeInserted(prevSize+1, result.size)
+        datas1.let {
+            it.clear()
+        }
     }
 }
