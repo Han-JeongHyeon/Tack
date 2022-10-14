@@ -1,8 +1,6 @@
 package com.example.myapplication
 
 import android.content.Context
-import android.util.Log
-import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +9,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
+
+/*
+1. SqliteHelper -> Room library
+2. AsyncTask -> kotlin coroutine
+3. Recyclerview.Adapter -> ListAdapter (DiffUtil)
+ */
+
 class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
-//    var datas = SparseArray<DateClassTest>()
-    var datas = mutableListOf<DateClassTest>()
+    var datas = mutableListOf<Fishs>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
@@ -25,12 +29,7 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
     override fun getItemCount(): Int = datas.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        if(position % 2 == 0){
-//            holder.bind(datas[position])
-//        }
-//        else{
-            holder.bind(datas[position])
-//        }
+        holder.bind(datas[position])
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -38,10 +37,9 @@ class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewH
         private val fishprice: TextView = itemView.findViewById(R.id.fishprice)
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_photo)
 
-        fun bind(item: DateClassTest) {
-//            Log.d("TAG", "${position}")
+        fun bind(item: Fishs) {
             fishname.text = "이름 : ${item.name}"
-            fishprice.text = "가격 : ${item.price}원"
+            fishprice.text = "가격 : ${item.Price}원"
             Glide.with(itemView).load(item.image).into(imgProfile)
         }
     }

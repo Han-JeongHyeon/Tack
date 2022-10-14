@@ -1,16 +1,15 @@
 package com.example.myapplication
 
-import android.util.Log
-import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import com.google.gson.annotations.SerializedName
+import retrofit2.http.Url
 
-interface FishName_interface {
+data class FishName(
+    //"이름":{"변수 이름1":"값1","변수 이름2":"값2"}일 때 이런식으로 표현한다
+    val name: Name,
+    @SerializedName("icon_uri") val image : String,
+    @SerializedName("price") val price : String
+)
 
-    @GET("fish/{fishID}")
-    fun getName(
-        @Path("fishID") fishID: String
-    ): Call<FishName>
-
-}
+data class Name(
+    @SerializedName("name-KRko") val KRko : String
+)
