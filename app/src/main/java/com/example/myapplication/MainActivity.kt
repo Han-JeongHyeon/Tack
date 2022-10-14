@@ -1,13 +1,11 @@
 package com.example.myapplication
 
 import android.annotation.SuppressLint
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.example.myapplication.databinding.ActivityMainBinding
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -18,20 +16,18 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.util.*
-import kotlin.math.log
-
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    lateinit var fishAdapter: Adapter
+    private lateinit var fishAdapter: Adapter
 
     var page = 0
-    val pageSize = 20
+    private var pageSize = 20
 
     //데이터 베이스
-    var db : AppDatabase? = null
+    private var db : AppDatabase? = null
 
     @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,11 +95,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 //api 요청 성공 처리
                 override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
-                    var result: FishName? = response.body()
+                    val result: FishName? = response.body()
                     if (Random().nextInt(10) + 1 == 1) requestCnt++
                     else {
                         userDao.insertAll(
-                            Fishs("$id".toInt(), "${result!!.name.KRko}", "${result?.price}".toInt(), "${result?.image}"))
+                            Fishs(id, result!!.name.KRko, result.price.toInt(), result.image))
                         requestCnt1++
                     }
                     if (requestCnt1 + requestCnt == requestIds.size) addDataToRecyclerView()
