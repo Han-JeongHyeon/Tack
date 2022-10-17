@@ -12,9 +12,8 @@ interface Dao {
     fun getAll(): List<Fishs>
 
     @Query("SELECT * FROM Fishs " +
-            "where fishNum > :page * :pageSize and fishNum <= :page * :pageSize + :pageSize " +
-            "limit 0, :pageSize")
-    fun getWhere(page: Int, pageSize : Int) : List<Fishs>
+            "limit 0, :page * :pageSize + :pageSize")
+    fun getPage(page: Int, pageSize : Int) : List<Fishs>
 
     @Insert
     fun insertAll(vararg users: Fishs)

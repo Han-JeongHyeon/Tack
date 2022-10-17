@@ -2,11 +2,18 @@ package com.example.myapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.CoroutinesRoom
 import androidx.room.Room
 import com.example.myapplication.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -16,12 +23,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var fishAdapter: Adapter
+    private var fishAdapter = Adapter()
 
     var page = 0
     private var pageSize = 20
@@ -35,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        fishAdapter = Adapter(this)
         binding.Recycler.adapter = fishAdapter
 
         db = Room.databaseBuilder(
@@ -43,29 +50,31 @@ class MainActivity : AppCompatActivity() {
             AppDatabase::class.java, "fish"
         ).allowMainThreadQueries().build()
 
-        api()
+//        apiRequest()
 
         binding.Recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (!binding.Recycler.canScrollVertically(1)) {
                     page++
-                    api()
+                    apiRequest()
                 }
             }
         })
 
     }
 
-    fun api() {
-        if (page * pageSize + pageSize > 80) {
+    private fun apiRequest() {
+        val pageValue = page * pageSize
+
+        if (pageValue + pageSize > 80) {
             return
         }
 
         val userDao = db!!.userDao()
 
-        val requiredIds = ((page * pageSize) + 1..(page * pageSize + pageSize)).toList()
-        val requestIds = requiredIds.minus(userDao.getWhere(page, pageSize).map { it.fishNum }.toSet())
+        val requiredIds = ((pageValue) + 1..(pageValue + pageSize)).toList()
+        val requestIds = requiredIds.minus(userDao.getPage(page, pageSize).map { it.fishNum }.toSet())
 
         var requestCnt = 0
         var requestCnt1 = 0
@@ -87,6 +96,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+//        var arrayFailNum = ArrayList<Int>()
+
         for (id in requestIds) {
             service.getName("$id").enqueue(object : Callback<FishName> {
                 //api 요청 실패 처리
@@ -96,15 +107,23 @@ class MainActivity : AppCompatActivity() {
                 //api 요청 성공 처리
                 override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
                     val result: FishName? = response.body()
-                    if (Random().nextInt(10) + 1 == 1) requestCnt++
+                    requestCnt++
+                    if (Random().nextInt(10) + 1 == 1) requestCnt1++ //arrayFailNum.add(id)
                     else {
                         userDao.insertAll(
                             Fishs(id, result!!.name.KRko, result.price.toInt(), result.image))
-                        requestCnt1++
                     }
-                    if (requestCnt1 + requestCnt == requestIds.size) addDataToRecyclerView()
-
-                    if (requestCnt == requestIds.size) binding.text.text = "데이터를 가져오지 못했습니다."
+                    if (requestCnt == requestIds.size) {
+//                        if (arrayFailNum.isNotEmpty()) {
+//                            Toast.makeText(
+//                                this@MainActivity,
+//                                "${arrayFailNum}}번 값을 불러오지 못했습니다",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+                        addDataToRecyclerView()
+                    }
+                    if (requestCnt1 == requestIds.size) binding.text.text = "데이터를 가져오지 못했습니다."
                 }
             })
         }
@@ -114,13 +133,9 @@ class MainActivity : AppCompatActivity() {
     private fun addDataToRecyclerView() {
         val userDao = db!!.userDao()
 
-        val prevSize = fishAdapter.datas.size
-
-        userDao.getWhere(page, pageSize).let {
-            fishAdapter.datas.addAll(it)
+        userDao.getPage(page, pageSize).let {
+            fishAdapter.submitList(it)
         }
-//        fishAdapter.notifyDataSetChanged()
-        fishAdapter.notifyItemRangeInserted(prevSize, userDao.getWhere(page,pageSize).size)
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -19,31 +20,36 @@ import com.example.myapplication.databinding.ActivityMainBinding
 3. Recyclerview.Adapter -> ListAdapter (DiffUtil)
  */
 
-class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+class Adapter : ListAdapter<Fishs, Adapter.ContactViewHolder>(ContactComparator()) {
 
-    var datas = mutableListOf<Fishs>()
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =
-            LayoutInflater.from(context).inflate(R.layout.textview, parent, false)
-        return ViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
+        return ContactViewHolder.create(parent)
     }
 
-    override fun getItemCount(): Int = datas.size
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(datas[position])
+    override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
+        val current = getItem(position)
+        holder.bind(current)
     }
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val fishname: TextView = itemView.findViewById(R.id.fishname)
         private val fishprice: TextView = itemView.findViewById(R.id.fishprice)
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_photo)
 
-        fun bind(item: Fishs) {
-            fishname.text = "이름 : ${item.name}"
-            fishprice.text = "가격 : ${item.Price}원"
-            Glide.with(itemView).load(item.image).into(imgProfile)
+        @SuppressLint("SetTextI18n")
+        fun bind(contact: Fishs) {
+            fishname.text = "이름 : ${contact.name}"
+            fishprice.text = "가격 : ${contact.Price}원"
+            Glide.with(itemView).load(contact.image).into(imgProfile)
         }
+
+        companion object {
+            fun create(parent: ViewGroup): ContactViewHolder {
+                val view: View = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.textview, parent, false)
+                return ContactViewHolder(view)
+            }
+        }
+
     }
 }

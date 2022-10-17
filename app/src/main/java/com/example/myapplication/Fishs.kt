@@ -2,7 +2,6 @@ package com.example.myapplication
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.w3c.dom.Text
 
 @Entity
 data class Fishs(
