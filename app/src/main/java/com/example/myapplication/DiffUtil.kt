@@ -2,7 +2,7 @@ package com.example.myapplication
 
 import androidx.recyclerview.widget.DiffUtil
 
-class ContactComparator : DiffUtil.ItemCallback<Fishs>() {
+class DiffUtil : DiffUtil.ItemCallback<Fishs>() {
     override fun areItemsTheSame(
         oldItem: Fishs,
         newItem: Fishs

@@ -10,10 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.room.CoroutinesRoom
 import androidx.room.Room
 import com.example.myapplication.databinding.ActivityMainBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -34,8 +31,14 @@ class MainActivity : AppCompatActivity() {
     var page = 0
     private var pageSize = 20
 
+//    private var viewModelJob : CompletableJob = Job()
+//    private val coroutineScope : CoroutineScope = CoroutineScope(
+//        viewModelJob + Dispatchers.Main
+//    )
+
     //데이터 베이스
     private var db : AppDatabase? = null
+    private var retrofit: Retrofit? = null
 
     @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +53,18 @@ class MainActivity : AppCompatActivity() {
             AppDatabase::class.java, "fish"
         ).allowMainThreadQueries().build()
 
-//        apiRequest()
+        val cache = Cache(File(cacheDir, "http_cache"), 10 * 1024 * 1024L)
+
+        val client = OkHttpClient.Builder()
+            .cache(cache)
+            .build()
+
+        retrofit = Retrofit.Builder()
+            .client(client)
+            .baseUrl("https://acnhapi.com/v1/")
+            .addConverterFactory(GsonConverterFactory.create()).build()
+
+        apiRequest()
 
         binding.Recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -73,61 +87,25 @@ class MainActivity : AppCompatActivity() {
 
         val userDao = db!!.userDao()
 
+        val service = retrofit!!.create(Interface::class.java)
+
         val requiredIds = ((pageValue) + 1..(pageValue + pageSize)).toList()
         val requestIds = requiredIds.minus(userDao.getPage(page, pageSize).map { it.fishNum }.toSet())
-
-        var requestCnt = 0
-        var requestCnt1 = 0
-
-        val cache = Cache(File(cacheDir, "http_cache"), 10 * 1024 * 1024L)
-
-        val client = OkHttpClient.Builder()
-            .cache(cache)
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .client(client)
-            .baseUrl("https://acnhapi.com/v1/")
-            .addConverterFactory(GsonConverterFactory.create()).build()
-        val service = retrofit.create(Interface::class.java)
 
         if (requestIds.isEmpty()) {
             addDataToRecyclerView()
             return
         }
 
-//        var arrayFailNum = ArrayList<Int>()
-
-        for (id in requestIds) {
-            service.getName("$id").enqueue(object : Callback<FishName> {
-                //api 요청 실패 처리
-                override fun onFailure(call: Call<FishName>, t: Throwable) {
-                    Log.d("Error", "" + t.toString())
+        CoroutineScope(Dispatchers.Main).launch{
+            for (id in requestIds) {
+                val apiResponse = service.getName("$id")
+                apiResponse.let {
+                    userDao.insertAll(Fishs(id, it.name.KRko, it.price.toInt(), it.image))
                 }
-                //api 요청 성공 처리
-                override fun onResponse(call: Call<FishName>, response: Response<FishName>) {
-                    val result: FishName? = response.body()
-                    requestCnt++
-                    if (Random().nextInt(10) + 1 == 1) requestCnt1++ //arrayFailNum.add(id)
-                    else {
-                        userDao.insertAll(
-                            Fishs(id, result!!.name.KRko, result.price.toInt(), result.image))
-                    }
-                    if (requestCnt == requestIds.size) {
-//                        if (arrayFailNum.isNotEmpty()) {
-//                            Toast.makeText(
-//                                this@MainActivity,
-//                                "${arrayFailNum}}번 값을 불러오지 못했습니다",
-//                                Toast.LENGTH_SHORT
-//                            ).show()
-//                        }
-                        addDataToRecyclerView()
-                    }
-                    if (requestCnt1 == requestIds.size) binding.text.text = "데이터를 가져오지 못했습니다."
-                }
-            })
+            }
+            addDataToRecyclerView()
         }
-
     }
 
     private fun addDataToRecyclerView() {

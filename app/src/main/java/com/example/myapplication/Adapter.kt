@@ -20,7 +20,7 @@ import com.example.myapplication.databinding.ActivityMainBinding
 3. Recyclerview.Adapter -> ListAdapter (DiffUtil)
  */
 
-class Adapter : ListAdapter<Fishs, Adapter.ContactViewHolder>(ContactComparator()) {
+class Adapter : ListAdapter<Fishs, Adapter.ContactViewHolder>(DiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.create(parent)
@@ -32,15 +32,15 @@ class Adapter : ListAdapter<Fishs, Adapter.ContactViewHolder>(ContactComparator(
     }
 
     class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val fishname: TextView = itemView.findViewById(R.id.fishname)
-        private val fishprice: TextView = itemView.findViewById(R.id.fishprice)
+        private val fishName: TextView = itemView.findViewById(R.id.fishname)
+        private val fishPrice: TextView = itemView.findViewById(R.id.fishprice)
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_photo)
 
         @SuppressLint("SetTextI18n")
-        fun bind(contact: Fishs) {
-            fishname.text = "이름 : ${contact.name}"
-            fishprice.text = "가격 : ${contact.Price}원"
-            Glide.with(itemView).load(contact.image).into(imgProfile)
+        fun bind(fish : Fishs) {
+            fishName.text = "이름 : ${fish.name}"
+            fishPrice.text = "가격 : ${fish.Price}원"
+            Glide.with(itemView).load(fish.image).into(imgProfile)
         }
 
         companion object {
