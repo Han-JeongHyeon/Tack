@@ -2,25 +2,18 @@ package com.example.myapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.CoroutinesRoom
 import androidx.room.Room
 import com.example.myapplication.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import okhttp3.Cache
 import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
-import java.util.*
-import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,11 +23,6 @@ class MainActivity : AppCompatActivity() {
 
     var page = 0
     private var pageSize = 20
-
-//    private var viewModelJob : CompletableJob = Job()
-//    private val coroutineScope : CoroutineScope = CoroutineScope(
-//        viewModelJob + Dispatchers.Main
-//    )
 
     //데이터 베이스
     private var db : AppDatabase? = null
@@ -97,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        CoroutineScope(Dispatchers.Main).launch{
+        lifecycleScope.launch(Dispatchers.IO){
             for (id in requestIds) {
                 val apiResponse = service.getName("$id")
                 apiResponse.let {
@@ -109,10 +97,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addDataToRecyclerView() {
-        val userDao = db!!.userDao()
+        lifecycleScope.launch(Dispatchers.IO){
+            val userDao = db!!.userDao()
+            val dbValue = userDao.getPage(page, pageSize)
 
-        userDao.getPage(page, pageSize).let {
-            fishAdapter.submitList(it)
+            withContext(Dispatchers.Main){
+                dbValue.let {
+                    fishAdapter.submitList(it)
+                }
+            }
         }
     }
 
