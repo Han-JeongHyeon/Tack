@@ -21,6 +21,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,31 +43,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        cache()
-
         viewModel.insertRoom()
 
         binding.Recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (!binding.Recycler.canScrollVertically(1)) {
-                    viewModel.insertRoom()
+                if (viewModel.roomInput.value == "") {
+                    if (!binding.Recycler.canScrollVertically(1)) {
+                        viewModel.insertRoom()
+                    }
                 }
             }
         })
 
         setView()
         setObserver()
-    }
-
-    fun cache(): OkHttpClient {
-        val cache = Cache(File(cacheDir, "http_cache"), 10 * 1024 * 1024L)
-
-        val client = OkHttpClient.Builder()
-            .cache(cache)
-            .build()
-
-        return client
     }
 
     private fun setView() {

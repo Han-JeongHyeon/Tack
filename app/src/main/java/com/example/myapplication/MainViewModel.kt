@@ -23,9 +23,22 @@ class MainViewModel(private val repository: Repository, application : Applicatio
     private var _roomTodoList = MutableLiveData<List<Fishs>>()
     var roomTodoList: LiveData<List<Fishs>> = _roomTodoList
 
+    var roomInput: MutableLiveData<String> = MutableLiveData()
+
     fun insertRoom() = viewModelScope.launch(Dispatchers.IO) {
+        if (page * pageSize + pageSize > 80) {
+            return@launch
+        }
+
         val requiredIds = ((page * pageSize) + 1..(page * pageSize + pageSize)).toList()
         val requestIds = requiredIds.minus(todoDao.getPage(page,pageSize).map { it.fishNum }.toSet())
+
+        if(requestIds.isEmpty()){
+            getFishName()
+            return@launch
+        }
+
+        roomInput.postValue("정보를 불러오는 중...")
 
         for (id in requestIds) {
             val apiResponse = RetrofitObject.getRetrofitService().getName("$id")
@@ -36,8 +49,9 @@ class MainViewModel(private val repository: Repository, application : Applicatio
         getFishName()
     }
 
-    fun getFishName(){
+    private fun getFishName(){
         viewModelScope.launch(Dispatchers.IO){
+            roomInput.postValue("")
             _roomTodoList.postValue(repository.roomSelectAllTodo(page, pageSize))
             page++
         }

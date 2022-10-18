@@ -13,7 +13,6 @@ object RetrofitObject {
     private fun getRetrofit(): Retrofit{
 
         return Retrofit.Builder()
-            .client(MainActivity().cache())
             .baseUrl("https://acnhapi.com/v1/")
             .addConverterFactory(GsonConverterFactory.create()).build()
     }
