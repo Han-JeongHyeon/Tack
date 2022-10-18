@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 
 class DiffUtil : DiffUtil.ItemCallback<Fishs>() {

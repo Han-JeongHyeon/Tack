@@ -1,12 +1,17 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
-apply plugin: 'kotlin-kapt'
 
 android {
     buildFeatures {
         viewBinding = true
+    }
+
+    // 데이터 바인딩
+    buildFeatures {
+        dataBinding true
     }
 
     compileSdk 32
@@ -33,15 +38,20 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
     }
 }
 
 dependencies {
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
 
-    implementation "com.squareup.retrofit2:converter-scalars:2.1.0"
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.1"
+    implementation "androidx.activity:activity-ktx:1.4.0"
+    implementation 'androidx.fragment:fragment-ktx:1.4.1'
+
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
 
     implementation "androidx.recyclerview:recyclerview:1.1.0"
 
@@ -59,6 +69,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
     // Room components
+    implementation 'androidx.room:room-ktx:2.4.3'
     implementation "androidx.room:room-runtime:2.4.3"
     kapt "androidx.room:room-compiler:2.4.3"
     implementation "androidx.room:room-ktx:2.4.3"
@@ -71,4 +82,41 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
 
+    // RecyclerView
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:converter-scalars:2.1.0"
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+
+    // ViewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+
+    // Livedata
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+
+// RecyclerView
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
+
+// Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+
+// ViewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+
+// Livedata
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+
+// Room
+    implementation 'androidx.room:room-ktx:2.4.3'
+    implementation 'androidx.room:room-runtime:2.4.3'
+    kapt 'androidx.room:room-compiler:2.4.3'
+
+// Coroutine
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
 }
