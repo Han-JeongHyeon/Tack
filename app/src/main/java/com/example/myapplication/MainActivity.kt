@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         )[MainViewModel::class.java]
     }
 
-    private var fishAdapter = Adapter()
+    private var fishAdapter : Adapter? = null
 
     private lateinit var roomAdapter: Adapter
 
@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        fishAdapter = Adapter(application)
 
         viewModel.insertFishList(baseContext)
 
@@ -64,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
-        roomAdapter = Adapter().apply {
+        roomAdapter = Adapter(application).apply {
             setHasStableIds(true)
         }
 
@@ -79,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         binding.Recycler.adapter = fishAdapter
 
         viewModel.selectList.observe(this) {
-            fishAdapter.submitList(it)
+            fishAdapter!!.submitList(it)
         }
     }
 

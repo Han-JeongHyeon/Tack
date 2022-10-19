@@ -16,6 +16,10 @@ class Repository(application : Application) {
         fishListDao.insertAll(list)
     }
 
+    suspend fun insertFavorite(list : Favorite) {
+        fishListDao.insertFavorite(list)
+    }
+
     companion object {
         private var instance: Repository? = null
 

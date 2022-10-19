@@ -2,6 +2,8 @@ package com.example.myapplication
 
 import android.app.Application
 import android.content.Context
+import android.graphics.pdf.PdfDocument
+import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 
@@ -23,7 +25,7 @@ class MainViewModel(private val repository: Repository, application: Application
         }
 
         val requiredIds = ((page * pageSize) + 1..(page * pageSize + pageSize)).toList()
-        val requestIds = requiredIds.minus(fishListDao.getPage(0,20).map { it.fishNum }.toSet())
+        val requestIds = requiredIds.minus(fishListDao.getPage(page,pageSize).map { it.fishNum }.toSet())
 
         roomInput.postValue("정보를 불러오는 중...")
 
@@ -36,6 +38,10 @@ class MainViewModel(private val repository: Repository, application: Application
             }
         }
         getFishList()
+    }
+
+    fun favorite() {
+        Log.d("TAG", "asd  ")
     }
 
     private fun getFishList(){

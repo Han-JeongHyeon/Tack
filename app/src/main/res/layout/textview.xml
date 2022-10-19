@@ -1,50 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/img_photo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2" />
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.myapplication.MainViewModel" />
+    </data>
 
-    <TextView
-        android:id="@+id/fishname"
-        android:layout_width="251dp"
-        android:layout_height="34dp"
-        android:layout_marginLeft="20dp"
-        android:text="이름"
-        android:textColor="@color/black"
-        android:gravity="center|left"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintLeft_toRightOf="@id/img_photo"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp">
 
-    <TextView
-        android:id="@+id/fishprice"
-        android:layout_width="251dp"
-        android:layout_height="34dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="52dp"
-        android:gravity="center|left"
-        android:text="가격"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintLeft_toRightOf="@id/img_photo"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/img_photo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.2" />
+
+        <TextView
+            android:id="@+id/fishname"
+            android:layout_width="251dp"
+            android:layout_height="34dp"
+            android:layout_marginLeft="20dp"
+            android:text="이름"
+            android:textColor="@color/black"
+            android:gravity="center|left"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toRightOf="@id/img_photo"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/fishprice"
+            android:layout_width="177dp"
+            android:layout_height="41dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="52dp"
+            android:gravity="center|left"
+            android:text="가격"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toRightOf="@id/img_photo"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/favorite"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="48dp"
+            android:background="@drawable/favorite_border"
+            app:layout_constraintStart_toEndOf="@+id/fishprice"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
