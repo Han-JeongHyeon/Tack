@@ -7,6 +7,6 @@ interface Interface {
     @GET("fish/{fishID}")
     suspend fun getName(
         @Path("fishID") fishID: String
-    ): FishName
+    ): FishApiName
 
 }

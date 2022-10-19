@@ -16,7 +16,7 @@ import com.bumptech.glide.Glide
 3. Recyclerview.Adapter -> ListAdapter (DiffUtil)
  */
 
-class Adapter : ListAdapter<Fishs, Adapter.ContactViewHolder>(DiffUtil()) {
+class Adapter : ListAdapter<Fish, Adapter.ContactViewHolder>(DiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.create(parent)
@@ -33,7 +33,7 @@ class Adapter : ListAdapter<Fishs, Adapter.ContactViewHolder>(DiffUtil()) {
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_photo)
 
         @SuppressLint("SetTextI18n")
-        fun bind(fish : Fishs) {
+        fun bind(fish : Fish) {
             fishName.text = "이름 : ${fish.name}"
             fishPrice.text = "가격 : ${fish.Price}원"
             Glide.with(itemView).load(fish.image).into(imgProfile)

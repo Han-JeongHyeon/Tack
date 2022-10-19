@@ -1,19 +1,18 @@
 package com.example.myapplication
 
-import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 
-class DiffUtil : DiffUtil.ItemCallback<Fishs>() {
+class DiffUtil : DiffUtil.ItemCallback<Fish>() {
     override fun areItemsTheSame(
-        oldItem: Fishs,
-        newItem: Fishs
+        oldItem: Fish,
+        newItem: Fish
     ): Boolean {
         return oldItem.fishNum == newItem.fishNum
     }
 
     override fun areContentsTheSame(
-        oldItem: Fishs,
-        newItem: Fishs
+        oldItem: Fish,
+        newItem: Fish
     ): Boolean {
         return oldItem == newItem
     }

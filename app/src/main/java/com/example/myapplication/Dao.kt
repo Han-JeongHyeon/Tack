@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -9,15 +8,15 @@ import androidx.room.Query
 @Dao
 interface Dao {
 
-    @Query("SELECT * FROM Fishs")
-    fun getAll(): List<Fishs>
+    @Query("SELECT * FROM Fish")
+    fun getAll(): List<Fish>
 
-    @Query("SELECT * FROM Fishs where fishNum <= :page * :pageSize + :pageSize")
-    fun getPage(page: Int, pageSize : Int) : List<Fishs>
+    @Query("SELECT * FROM Fish where fishNum <= :page * :pageSize + :pageSize")
+    fun getPage(page: Int, pageSize : Int) : List<Fish>
 
     @Insert
-    suspend fun insertAll(vararg users: Fishs)
+    suspend fun insertAll(vararg users: Fish)
 
     @Delete
-    fun delete(user: Fishs)
+    fun delete(user: Fish)
 }

@@ -1,27 +1,19 @@
 package com.example.myapplication
 
 import android.app.Application
-import android.util.Log
-import androidx.lifecycle.LiveData
-import retrofit2.Response
 
 class Repository(application : Application) {
 
     // Room Dao
-    private val todoDao = AppDatabase.getInstance(application)!!.getFishDao()
+    private val fishListDao = AppDatabase.getInstance(application)!!.getFishDao()
 
     // Use Room
-    fun roomSelectAllTodo(page : Int, pageSize : Int): List<Fishs> {
-        return todoDao.getPage(page, pageSize)
+    fun selectPaging(page : Int, pageSize : Int): List<Fish> {
+        return fishListDao.getPage(page, pageSize)
     }
 
-    fun roomSelectAll(): List<Fishs> {
-        return todoDao.getAll()
-    }
-
-    suspend fun roomInsertTodo(todo: Fishs) {
-        Log.d("TAG", "adsda$todo")
-        todoDao.insertAll(todo)
+    suspend fun insertFishList(list : Fish) {
+        fishListDao.insertAll(list)
     }
 
     companion object {

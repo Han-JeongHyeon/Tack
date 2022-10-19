@@ -43,14 +43,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        viewModel.insertRoom(baseContext)
+        viewModel.insertFishList(baseContext)
 
         binding.Recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (viewModel.roomInput.value == "") {
                     if (!binding.Recycler.canScrollVertically(1)) {
-                        viewModel.insertRoom(baseContext)
+                        viewModel.insertFishList(baseContext)
                     }
                 }
             }
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
     private fun setObserver() {
         binding.Recycler.adapter = fishAdapter
 
-        viewModel.roomTodoList.observe(this) {
+        viewModel.selectList.observe(this) {
             fishAdapter.submitList(it)
         }
     }

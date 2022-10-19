@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.app.Application
 import android.content.Context
 import android.media.audiofx.DynamicsProcessing
+import android.util.Log
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -26,6 +27,7 @@ object RetrofitObject {
     }
 
     fun getRetrofitService(context: Context): Interface{
+        Log.d("TAG", "getRetrofitService")
         return getRetrofit(context).create(Interface::class.java)
     }
 

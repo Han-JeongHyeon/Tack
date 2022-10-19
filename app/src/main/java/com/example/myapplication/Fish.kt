@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Fishs(
+data class Fish(
     @PrimaryKey val fishNum : Int,
     val name : String,
     val Price : Int,

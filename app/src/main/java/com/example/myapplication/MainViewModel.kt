@@ -2,52 +2,46 @@ package com.example.myapplication
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
-import androidx.activity.viewModels
 import androidx.lifecycle.*
-import androidx.room.Room
 import kotlinx.coroutines.*
-import okhttp3.Cache
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
 
 class MainViewModel(private val repository: Repository, application: Application) : ViewModel() {
 
-    private val todoDao = AppDatabase.getInstance(application)!!.getFishDao()
+    private val fishListDao = AppDatabase.getInstance(application)!!.getFishDao()
 
     private var page = 0
-    var pageSize = 20
+    private var pageSize = 20
 
-    private var _roomTodoList = MutableLiveData<List<Fishs>>()
-    var roomTodoList: LiveData<List<Fishs>> = _roomTodoList
+    private var _selectList = MutableLiveData<List<Fish>>()
+    var selectList: LiveData<List<Fish>> = _selectList
 
     var roomInput: MutableLiveData<String> = MutableLiveData()
 
-    fun insertRoom(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun insertFishList(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         if (page * pageSize + pageSize > 80) {
             return@launch
         }
 
         val requiredIds = ((page * pageSize) + 1..(page * pageSize + pageSize)).toList()
-        val requestIds = requiredIds.minus(todoDao.getPage(page,pageSize).map { it.fishNum }.toSet())
+        val requestIds = requiredIds.minus(fishListDao.getPage(0,20).map { it.fishNum }.toSet())
 
         roomInput.postValue("정보를 불러오는 중...")
 
+        val requestApi = RetrofitObject.getRetrofitService(context)
+
         for (id in requestIds) {
-            val apiResponse = RetrofitObject.getRetrofitService(context).getName("$id")
+            val apiResponse = requestApi.getName("$id")
             apiResponse.let {
-                repository.roomInsertTodo(Fishs(id, it.name.KRko, it.price.toInt(), it.image))
+                repository.insertFishList(Fish(id, it.name.KRko, it.price.toInt(), it.image))
             }
         }
-        getFishName()
+        getFishList()
     }
 
-    private fun getFishName(){
+    private fun getFishList(){
         viewModelScope.launch(Dispatchers.IO){
             roomInput.postValue("")
-            _roomTodoList.postValue(repository.roomSelectAllTodo(page, pageSize))
+            _selectList.postValue(repository.selectPaging(page, pageSize))
             page++
         }
     }
