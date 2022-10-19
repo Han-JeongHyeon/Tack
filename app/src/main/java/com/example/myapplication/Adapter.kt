@@ -49,18 +49,4 @@ class Adapter : ListAdapter<Fishs, Adapter.ContactViewHolder>(DiffUtil()) {
 
     }
 
-//    @SuppressLint("NotifyDataSetChanged")
-//    fun setData(newList: List<Fishs>) {
-//        list = newList
-//        notifyDataSetChanged()
-//    }
-//
-//    interface OnItemClickListener {
-//        fun onItemClick(v: View, item: Fishs)
-//        fun onItemLongClick(v: View, item: Fishs)
-//    }
-//
-//    private var listener : OnItemClickListener? = null
-//    fun setOnItemClickListener(listener : OnItemClickListener) { this.listener = listener }
-
 }

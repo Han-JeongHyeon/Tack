@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.app.Application
 import android.content.Context
+import android.media.audiofx.DynamicsProcessing
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -10,15 +11,22 @@ import java.io.File
 
 object RetrofitObject {
 
-    private fun getRetrofit(): Retrofit{
+    private fun getRetrofit(context: Context): Retrofit{
+
+        val cache = Cache(File(context.cacheDir,"HTTP_Cache"),10 * 1024 * 1024L)
+
+        val client = OkHttpClient.Builder()
+            .cache(cache)
+            .build()
 
         return Retrofit.Builder()
+            .client(client)
             .baseUrl("https://acnhapi.com/v1/")
             .addConverterFactory(GsonConverterFactory.create()).build()
     }
 
-    fun getRetrofitService(): Interface{
-        return getRetrofit().create(Interface::class.java)
+    fun getRetrofitService(context: Context): Interface{
+        return getRetrofit(context).create(Interface::class.java)
     }
 
 }

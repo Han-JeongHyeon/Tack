@@ -43,14 +43,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        viewModel.insertRoom()
+        viewModel.insertRoom(baseContext)
 
         binding.Recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (viewModel.roomInput.value == "") {
                     if (!binding.Recycler.canScrollVertically(1)) {
-                        viewModel.insertRoom()
+                        viewModel.insertRoom(baseContext)
                     }
                 }
             }
@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity() {
     private fun setView() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-
 
         roomAdapter = Adapter().apply {
             setHasStableIds(true)

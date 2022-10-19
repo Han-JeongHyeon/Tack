@@ -13,11 +13,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 
-class MainViewModel(private val repository: Repository, application : Application) : ViewModel() {
+class MainViewModel(private val repository: Repository, application: Application) : ViewModel() {
 
     private val todoDao = AppDatabase.getInstance(application)!!.getFishDao()
 
-    var page = 0
+    private var page = 0
     var pageSize = 20
 
     private var _roomTodoList = MutableLiveData<List<Fishs>>()
@@ -25,7 +25,7 @@ class MainViewModel(private val repository: Repository, application : Applicatio
 
     var roomInput: MutableLiveData<String> = MutableLiveData()
 
-    fun insertRoom() = viewModelScope.launch(Dispatchers.IO) {
+    fun insertRoom(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         if (page * pageSize + pageSize > 80) {
             return@launch
         }
@@ -33,15 +33,10 @@ class MainViewModel(private val repository: Repository, application : Applicatio
         val requiredIds = ((page * pageSize) + 1..(page * pageSize + pageSize)).toList()
         val requestIds = requiredIds.minus(todoDao.getPage(page,pageSize).map { it.fishNum }.toSet())
 
-        if(requestIds.isEmpty()){
-            getFishName()
-            return@launch
-        }
-
         roomInput.postValue("정보를 불러오는 중...")
 
         for (id in requestIds) {
-            val apiResponse = RetrofitObject.getRetrofitService().getName("$id")
+            val apiResponse = RetrofitObject.getRetrofitService(context).getName("$id")
             apiResponse.let {
                 repository.roomInsertTodo(Fishs(id, it.name.KRko, it.price.toInt(), it.image))
             }
