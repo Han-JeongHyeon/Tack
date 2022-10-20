@@ -35,36 +35,18 @@ class Adapter(val application: Application) :
                 mainActivity?.favoriteClick(itemView, layoutPosition)
             }
 
-            getFavorite()
+            CoroutineScope(Dispatchers.IO).launch {
+                val background = if (fishListDao.selectFavorite(position+1)) R.drawable.favorite
+                else R.drawable.favorite_border
+                withContext(Dispatchers.Main) {
+                    binding.favorite.setBackgroundResource(background)
+                }
+            }
 
             binding.fishname.text = "이름 : ${fish.name}"
             binding.fishprice.text = "가격 : ${fish.Price}원"
             Glide.with(itemView).load(fish.image).into(binding.imgPhoto)
         }
-
-        private fun getFavorite() {
-            CoroutineScope(Dispatchers.IO).launch {
-                val getFavorite = fishListDao.selectFavorite(layoutPosition + 1)
-                withContext(Dispatchers.Main) {
-                    when (getFavorite) {
-                        true ->
-                            binding.favorite.setBackgroundResource(R.drawable.favorite)
-                        false ->
-                            binding.favorite.setBackgroundResource(R.drawable.favorite_border)
-                    }
-                }
-            }
-        }
-
-//        private fun getFavorite() {
-//            CoroutineScope(Dispatchers.IO).launch {
-//                val background = if (fishListDao.selectFavorite(position+1)) R.drawable.favorite
-//                else R.drawable.favorite_border
-//                withContext(Dispatchers.Main) {
-//                    binding.favorite.setBackgroundResource(background)
-//                }
-//            }
-//        }
 
     }
 
