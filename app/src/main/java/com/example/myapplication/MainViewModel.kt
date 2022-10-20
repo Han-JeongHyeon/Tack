@@ -34,14 +34,11 @@ class MainViewModel(private val repository: Repository, application: Application
         for (id in requestIds) {
             val apiResponse = requestApi.getName("$id")
             apiResponse.let {
+                fishListDao.insertFavorite(Favorite(id,false))
                 repository.insertFishList(Fish(id, it.name.KRko, it.price.toInt(), it.image))
             }
         }
         getFishList()
-    }
-
-    fun favorite() {
-        Log.d("TAG", "asd  ")
     }
 
     private fun getFishList(){
