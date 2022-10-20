@@ -22,23 +22,17 @@ import kotlinx.coroutines.withContext
 class Adapter(val application: Application) :
     ListAdapter<Fish, Adapter.ContactViewHolder>(DiffUtil()) {
 
+    private val mainActivity = MainActivity.getInstance()
+
     // 생성된 뷰 홀더에 값 지정
-    class ContactViewHolder(private val binding: TextviewBinding, application: Application) :
+    inner class ContactViewHolder(private val binding: TextviewBinding, application: Application) :
         RecyclerView.ViewHolder(binding.root) {
         private val fishListDao = AppDatabase.getInstance(application)!!.getFishDao()
 
         @SuppressLint("SetTextI18n")
         fun bind(fish: Fish) {
             binding.favorite.setOnClickListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    when (fishListDao.selectFavorite(layoutPosition + 1)) {
-                        true ->
-                            fishListDao.updateFavorite(Favorite(layoutPosition + 1, false))
-                        false ->
-                            fishListDao.updateFavorite(Favorite(layoutPosition + 1, true))
-                    }
-                    getFavorite()
-                }
+                mainActivity?.favoriteClick(itemView, layoutPosition)
             }
 
             getFavorite()
@@ -62,6 +56,16 @@ class Adapter(val application: Application) :
             }
         }
 
+//        private fun getFavorite() {
+//            CoroutineScope(Dispatchers.IO).launch {
+//                val background = if (fishListDao.selectFavorite(position+1)) R.drawable.favorite
+//                else R.drawable.favorite_border
+//                withContext(Dispatchers.Main) {
+//                    binding.favorite.setBackgroundResource(background)
+//                }
+//            }
+//        }
+
     }
 
     // 어떤 xml 으로 뷰 홀더를 생성할지 지정
@@ -74,5 +78,4 @@ class Adapter(val application: Application) :
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
-
 }

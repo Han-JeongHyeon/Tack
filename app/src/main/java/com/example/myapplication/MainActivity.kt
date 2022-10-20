@@ -38,6 +38,17 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var roomAdapter: Adapter
 
+    init{
+        instance = this
+    }
+
+    companion object{
+        private var instance:MainActivity? = null
+        fun getInstance(): MainActivity? {
+            return instance
+        }
+    }
+
     @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +71,10 @@ class MainActivity : AppCompatActivity() {
 
         setView()
         setObserver()
+    }
+
+    fun favoriteClick(view: View, position : Int) {
+        viewModel.favorite(view,position)
     }
 
     private fun setView() {

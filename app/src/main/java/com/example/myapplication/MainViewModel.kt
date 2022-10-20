@@ -2,8 +2,12 @@ package com.example.myapplication
 
 import android.app.Application
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.graphics.pdf.PdfDocument
 import android.util.Log
+import android.view.View
+import android.widget.Button
+import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 
@@ -34,11 +38,30 @@ class MainViewModel(private val repository: Repository, application: Application
         for (id in requestIds) {
             val apiResponse = requestApi.getName("$id")
             apiResponse.let {
-                fishListDao.insertFavorite(Favorite(id,false))
                 repository.insertFishList(Fish(id, it.name.KRko, it.price.toInt(), it.image))
             }
         }
         getFishList()
+    }
+
+    fun favorite(view: View, position : Int) {
+        val favorite : Button = view.findViewById(R.id.favorite)
+
+        val position = position + 1
+        var background : Int
+
+        CoroutineScope(Dispatchers.IO).launch {
+            if (fishListDao.selectFavorite(position)) {
+                background = R.drawable.favorite_border
+                fishListDao.delete(Favorite(position))
+            } else {
+                background = R.drawable.favorite
+                fishListDao.insertFavorite(Favorite(position))
+            }
+            withContext(Dispatchers.Main) {
+                favorite.setBackgroundResource(background)
+            }
+        }
     }
 
     private fun getFishList(){

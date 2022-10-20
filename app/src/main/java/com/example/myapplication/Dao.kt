@@ -12,7 +12,7 @@ interface Dao {
     @Query("SELECT * FROM Fish where fishNum <= :page * :pageSize + :pageSize")
     fun getPage(page: Int, pageSize : Int) : List<Fish>
 
-    @Query("select favorite from Favorite where id = :id")
+    @Query("select * from Favorite where id = :id")
     fun selectFavorite(id : Int): Boolean
 
     @Insert

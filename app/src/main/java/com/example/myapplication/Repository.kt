@@ -8,6 +8,10 @@ class Repository(application : Application) {
     private val fishListDao = AppDatabase.getInstance(application)!!.getFishDao()
 
     // Use Room
+    fun selectall(): List<Fish> {
+        return fishListDao.getAll()
+    }
+
     fun selectPaging(page : Int, pageSize : Int): List<Fish> {
         return fishListDao.getPage(page, pageSize)
     }
