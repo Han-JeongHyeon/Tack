@@ -5,8 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Fish(
-    @PrimaryKey val fishNum : Int,
+    @PrimaryKey val id : Int,
     val name : String,
     val Price : Int,
-    val image : String
+    val image : String,
+    var favorite : Boolean
 )

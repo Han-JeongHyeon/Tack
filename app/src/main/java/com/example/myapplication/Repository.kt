@@ -1,6 +1,8 @@
 package com.example.myapplication
 
 import android.app.Application
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
 class Repository(application : Application) {
 
@@ -8,7 +10,7 @@ class Repository(application : Application) {
     private val fishListDao = AppDatabase.getInstance(application)!!.getFishDao()
 
     // Use Room
-    fun selectall(): List<Fish> {
+    fun selectall(): LiveData<List<Fish>> {
         return fishListDao.getAll()
     }
 
@@ -20,8 +22,8 @@ class Repository(application : Application) {
         fishListDao.insertAll(list)
     }
 
-    suspend fun insertFavorite(list : Favorite) {
-        fishListDao.insertFavorite(list)
+    suspend fun updateFavorite(list : Fish) {
+        fishListDao.updateFavorite(list)
     }
 
     companion object {

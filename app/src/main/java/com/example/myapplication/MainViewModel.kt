@@ -2,12 +2,9 @@ package com.example.myapplication
 
 import android.app.Application
 import android.content.Context
-import android.graphics.drawable.Drawable
-import android.graphics.pdf.PdfDocument
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 
@@ -21,6 +18,8 @@ class MainViewModel(private val repository: Repository, application: Application
     private var _selectList = MutableLiveData<List<Fish>>()
     var selectList: LiveData<List<Fish>> = _selectList
 
+//    var selectList_: LiveData<List<Fish>> = repository.selectall()
+
     var roomInput: MutableLiveData<String> = MutableLiveData()
 
     fun insertFishList(context: Context) = viewModelScope.launch(Dispatchers.IO) {
@@ -28,8 +27,11 @@ class MainViewModel(private val repository: Repository, application: Application
             return@launch
         }
 
+        Log.d("TAG", "insertFishList")
+
         val requiredIds = ((page * pageSize) + 1..(page * pageSize + pageSize)).toList()
-        val requestIds = requiredIds.minus(fishListDao.getPage(page,pageSize).map { it.fishNum }.toSet())
+
+        val requestIds = requiredIds.minus(fishListDao.getPage(page,pageSize).map { it.id }.toSet())
 
         roomInput.postValue("정보를 불러오는 중...")
 
@@ -38,33 +40,33 @@ class MainViewModel(private val repository: Repository, application: Application
         for (id in requestIds) {
             val apiResponse = requestApi.getName("$id")
             apiResponse.let {
-                repository.insertFishList(Fish(id, it.name.KRko, it.price.toInt(), it.image))
+                repository.insertFishList(Fish(id, it.name.KRko, it.price.toInt(), it.image, false))
             }
         }
         getFishList()
     }
 
-    fun favorite(view: View, position : Int) {
+    fun favorite(view: View, item : Fish) {
         val favorite : Button = view.findViewById(R.id.favorite)
 
-        val position = position + 1
         var background : Int
 
-        CoroutineScope(Dispatchers.IO).launch {
-            if (fishListDao.selectFavorite(position)) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (fishListDao.selectFavorite(item.id)) {
                 background = R.drawable.favorite_border
-                fishListDao.delete(Favorite(position))
+                item.favorite = false
             } else {
                 background = R.drawable.favorite
-                fishListDao.insertFavorite(Favorite(position))
+                item.favorite = true
             }
+            repository.updateFavorite(item)
             withContext(Dispatchers.Main) {
                 favorite.setBackgroundResource(background)
             }
         }
     }
 
-    private fun getFishList(){
+    fun getFishList(){
         viewModelScope.launch(Dispatchers.IO){
             roomInput.postValue("")
             _selectList.postValue(repository.selectPaging(page, pageSize))

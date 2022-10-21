@@ -7,7 +7,7 @@ class DiffUtil : DiffUtil.ItemCallback<Fish>() {
         oldItem: Fish,
         newItem: Fish
     ): Boolean {
-        return oldItem.fishNum == newItem.fishNum
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(

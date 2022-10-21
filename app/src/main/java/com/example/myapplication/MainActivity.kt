@@ -1,27 +1,14 @@
 package com.example.myapplication
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
 import com.example.myapplication.databinding.ActivityMainBinding
-import kotlinx.coroutines.*
-import okhttp3.Cache
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
-import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,22 +21,8 @@ class MainActivity : AppCompatActivity() {
         )[MainViewModel::class.java]
     }
 
-    private var fishAdapter : Adapter? = null
+    private var fishAdapter: Adapter? = null
 
-    private lateinit var roomAdapter: Adapter
-
-    init{
-        instance = this
-    }
-
-    companion object{
-        private var instance:MainActivity? = null
-        fun getInstance(): MainActivity? {
-            return instance
-        }
-    }
-
-    @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -73,31 +46,37 @@ class MainActivity : AppCompatActivity() {
         setObserver()
     }
 
-    fun favoriteClick(view: View, position : Int) {
-        viewModel.favorite(view,position)
-    }
-
     private fun setView() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
-        roomAdapter = Adapter(application).apply {
-            setHasStableIds(true)
+        binding.Recycler.adapter = fishAdapter
+
+        fishAdapter = Adapter(application).apply {
+//            setHasStableIds(true)
+            setOnItemClickListener(object : Adapter.OnItemClickListener { // 이벤트 리스너
+                override fun onItemClick(v: View, item: Fish) {
+                    viewModel.favorite(v, item)
+                }
+//                override fun onItemLongClick(v: View, item: Fish) {
+//                }
+            })
         }
 
         binding.Recycler.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = roomAdapter
+            adapter = fishAdapter
         }
-
     }
 
     private fun setObserver() {
-        binding.Recycler.adapter = fishAdapter
-
         viewModel.selectList.observe(this) {
             fishAdapter!!.submitList(it)
         }
+
+//        viewModel.selectList_.observe(this){
+//            viewModel.getFishList()
+//        }
     }
 
 }

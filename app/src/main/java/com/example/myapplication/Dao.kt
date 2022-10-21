@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import androidx.room.Dao
 
@@ -7,23 +9,23 @@ import androidx.room.Dao
 interface Dao {
 
     @Query("SELECT * FROM Fish")
-    fun getAll(): List<Fish>
+    fun getAll(): LiveData<List<Fish>>
 
-    @Query("SELECT * FROM Fish where fishNum <= :page * :pageSize + :pageSize")
+    @Query("SELECT * FROM Fish where id <= :page * :pageSize + :pageSize")
     fun getPage(page: Int, pageSize : Int) : List<Fish>
 
-    @Query("select * from Favorite where id = :id")
+    @Query("select favorite from Fish where id = :id")
     fun selectFavorite(id : Int): Boolean
 
     @Insert
     suspend fun insertAll(vararg users: Fish)
 
-    @Insert
-    suspend fun insertFavorite(vararg users: Favorite)
+//    @Insert
+//    suspend fun insertFavorite(vararg users: Favorite)
 
     @Update
-    suspend fun updateFavorite(vararg users: Favorite)
+    suspend fun updateFavorite(vararg users: Fish)
 
-    @Delete
-    fun delete(user: Favorite)
+//    @Delete
+//    fun delete(user: Favorite)
 }
