@@ -18,7 +18,7 @@ class MainViewModel(private val repository: Repository, application: Application
     private var _selectList = MutableLiveData<List<Fish>>()
     var selectList: LiveData<List<Fish>> = _selectList
 
-//    var selectList_: LiveData<List<Fish>> = repository.selectall()
+    var selectListObserver: LiveData<List<Fish>> = fishListDao.getAll()
 
     var roomInput: MutableLiveData<String> = MutableLiveData()
 
@@ -27,10 +27,7 @@ class MainViewModel(private val repository: Repository, application: Application
             return@launch
         }
 
-        Log.d("TAG", "insertFishList")
-
         val requiredIds = ((page * pageSize) + 1..(page * pageSize + pageSize)).toList()
-
         val requestIds = requiredIds.minus(fishListDao.getPage(page,pageSize).map { it.id }.toSet())
 
         roomInput.postValue("정보를 불러오는 중...")

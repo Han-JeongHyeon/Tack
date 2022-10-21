@@ -74,9 +74,11 @@ class MainActivity : AppCompatActivity() {
             fishAdapter!!.submitList(it)
         }
 
-//        viewModel.selectList_.observe(this){
-//            viewModel.getFishList()
-//        }
+        viewModel.selectListObserver.observe(this){
+            if (viewModel.roomInput.value == "") {
+                viewModel.getFishList()
+            }
+        }
     }
 
 }
