@@ -15,6 +15,8 @@ class MainViewModel(private val repository: Repository, application: Application
     private var page = 0
     private var pageSize = 20
 
+    private var pageValue = 0
+
     private var _selectList = MutableLiveData<List<Fish>>()
     var selectList: LiveData<List<Fish>> = _selectList
 
@@ -23,12 +25,14 @@ class MainViewModel(private val repository: Repository, application: Application
     var roomInput: MutableLiveData<String> = MutableLiveData()
 
     fun insertFishList(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        if (page * pageSize + pageSize > 80) {
+        pageValue = page * pageSize
+
+        if (pageValue + pageSize > 80) {
             return@launch
         }
 
-        val requiredIds = ((page * pageSize) + 1..(page * pageSize + pageSize)).toList()
-        val requestIds = requiredIds.minus(fishListDao.getPage(page,pageSize).map { it.id }.toSet())
+        val requiredIds = ((pageValue) + 1..(pageValue + pageSize)).toList()
+        val requestIds = requiredIds.minus(fishListDao.getPage(pageValue + pageSize).map { it.id }.toSet())
 
         roomInput.postValue("정보를 불러오는 중...")
 
@@ -66,7 +70,7 @@ class MainViewModel(private val repository: Repository, application: Application
     fun getFishList(){
         viewModelScope.launch(Dispatchers.IO){
             roomInput.postValue("")
-            _selectList.postValue(repository.selectPaging(page, pageSize))
+            _selectList.postValue(repository.selectPaging(pageValue + pageSize))
             page++
         }
     }

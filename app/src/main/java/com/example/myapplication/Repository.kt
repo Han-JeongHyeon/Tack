@@ -14,8 +14,8 @@ class Repository(application : Application) {
         return fishListDao.getAll()
     }
 
-    fun selectPaging(page : Int, pageSize : Int): List<Fish> {
-        return fishListDao.getPage(page, pageSize)
+    fun selectPaging(pageSize : Int): List<Fish> {
+        return fishListDao.getPage(pageSize)
     }
 
     suspend fun insertFishList(list : Fish) {

@@ -11,11 +11,11 @@ interface Dao {
     @Query("SELECT * FROM Fish")
     fun getAll(): LiveData<List<Fish>>
 
-    @Query("SELECT * FROM Fish where id <= :page * :pageSize + :pageSize")
-    fun getPage(page: Int, pageSize : Int) : List<Fish>
+    @Query("SELECT * FROM Fish where id <= :pageSize")
+    fun getPage(pageSize : Int) : List<Fish>
 
-    @Query("SELECT * FROM Fish where id <= :page * :pageSize + :pageSize")
-    fun getPageList(page: Int, pageSize : Int) : LiveData<List<Fish>>
+//    @Query("SELECT * FROM Fish where id <= :page * :pageSize + :pageSize")
+//    fun getPageList(pageValue: Int) : LiveData<List<Fish>>
 
     @Query("select favorite from Fish where id = :id")
     fun selectFavorite(id : Int): Boolean
