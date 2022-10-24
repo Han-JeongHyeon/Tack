@@ -102,4 +102,11 @@ dependencies {
 // Coroutine
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+
+
+    implementation "io.insert-koin:koin-android:3.2.0"
+
+    // Koin Test
+    testImplementation "io.insert-koin:koin-test:3.2.0"
+    testImplementation "io.insert-koin:koin-test-junit4:3.2.0"
 }

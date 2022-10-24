@@ -14,6 +14,9 @@ interface Dao {
     @Query("SELECT * FROM Fish where id <= :pageSize")
     fun getPage(pageSize : Int) : List<Fish>
 
+    @Query("SELECT * FROM Fish where id <= :pageSize order by name")
+    fun getPageName(pageSize : Int) : List<Fish>
+
 //    @Query("SELECT * FROM Fish where id <= :page * :pageSize + :pageSize")
 //    fun getPageList(pageValue: Int) : LiveData<List<Fish>>
 
@@ -29,6 +32,6 @@ interface Dao {
     @Update
     suspend fun updateFavorite(vararg users: Fish)
 
-//    @Delete
-//    fun delete(user: Favorite)
+    @Delete
+    fun delete(user: Fish)
 }

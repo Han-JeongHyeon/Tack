@@ -8,9 +8,8 @@ import android.widget.Button
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 
-class MainViewModel(private val repository: Repository, application: Application) : ViewModel() {
-
-    private val fishListDao = AppDatabase.getInstance(application)!!.getFishDao()
+class MainViewModel(private val repository: Repository,
+                    private val retrofit: Retrofit) : ViewModel() {
 
     private var page = 0
     private var pageSize = 20
@@ -20,11 +19,11 @@ class MainViewModel(private val repository: Repository, application: Application
     private var _selectList = MutableLiveData<List<Fish>>()
     var selectList: LiveData<List<Fish>> = _selectList
 
-    var selectListObserver: LiveData<List<Fish>> = fishListDao.getAll()
+    var selectListObserver: LiveData<List<Fish>> = repository.selectAll()
 
     var roomInput: MutableLiveData<String> = MutableLiveData()
 
-    fun insertFishList(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun insertFishList() = viewModelScope.launch(Dispatchers.IO) {
         pageValue = page * pageSize
 
         if (pageValue + pageSize > 80) {
@@ -32,19 +31,18 @@ class MainViewModel(private val repository: Repository, application: Application
         }
 
         val requiredIds = ((pageValue) + 1..(pageValue + pageSize)).toList()
-        val requestIds = requiredIds.minus(fishListDao.getPage(pageValue + pageSize).map { it.id }.toSet())
+        val requestIds = requiredIds.minus(repository.selectPaging(pageValue + pageSize).map { it.id }.toSet())
 
         roomInput.postValue("정보를 불러오는 중...")
 
-        val requestApi = RetrofitObject.getRetrofitService(context)
-
         for (id in requestIds) {
-            val apiResponse = requestApi.getName("$id")
+            val apiResponse = retrofit.getRetrofitService().getName("$id")
             apiResponse.let {
                 repository.insertFishList(Fish(id, it.name.KRko, it.price.toInt(), it.image, false))
             }
         }
         getFishList()
+        page++
     }
 
     fun favorite(view: View, item : Fish) {
@@ -53,7 +51,7 @@ class MainViewModel(private val repository: Repository, application: Application
         var background : Int
 
         viewModelScope.launch(Dispatchers.IO) {
-            if (fishListDao.selectFavorite(item.id)) {
+            if (repository.selectFavorite(item.id)) {
                 background = R.drawable.favorite_border
                 item.favorite = false
             } else {
@@ -71,13 +69,12 @@ class MainViewModel(private val repository: Repository, application: Application
         viewModelScope.launch(Dispatchers.IO){
             roomInput.postValue("")
             _selectList.postValue(repository.selectPaging(pageValue + pageSize))
-            page++
         }
     }
 
-    class Factory(private val application : Application) : ViewModelProvider.Factory { // factory pattern
+    class Factory(private val application : Application, private val retrofit: Retrofit) : ViewModelProvider.Factory { // factory pattern
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(Repository.getInstance(application)!!,application) as T
+            return MainViewModel(Repository.getInstance(application)!!,retrofit) as T
         }
     }
 

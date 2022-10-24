@@ -20,11 +20,11 @@ import kotlinx.coroutines.*
 3. Recyclerview.Adapter -> ListAdapter (DiffUtil)
  */
 
-class Adapter(val application: Application) :
+class Adapter :
     ListAdapter<Fish, Adapter.ContactViewHolder>(DiffUtil()) {
 
     // 생성된 뷰 홀더에 값 지정
-    inner class ContactViewHolder(private val binding: TextviewBinding, application: Application) :
+    inner class ContactViewHolder(private val binding: TextviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
@@ -42,7 +42,7 @@ class Adapter(val application: Application) :
     // 어떤 xml 으로 뷰 홀더를 생성할지 지정
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val binding = TextviewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ContactViewHolder(binding, application)
+        return ContactViewHolder(binding)
     }
 
     // 뷰 홀더에 데이터 바인딩
@@ -52,11 +52,16 @@ class Adapter(val application: Application) :
         favorite.setOnClickListener {
             listener?.onItemClick(holder.itemView, getItem(position))
         }
+
+        holder.itemView.setOnLongClickListener {
+            listener?.onItemLongClick(holder.itemView, getItem(position))
+            return@setOnLongClickListener false
+        }
     }
 
     interface OnItemClickListener {
         fun onItemClick(v: View, item: Fish)
-//        fun onItemLongClick(v: View, item: Fish)
+        fun onItemLongClick(v: View, item: Fish)
     }
 
     private var listener : OnItemClickListener? = null
