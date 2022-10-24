@@ -7,9 +7,9 @@ import android.view.View
 import android.widget.Button
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
+import org.koin.android.ext.android.inject
 
-class MainViewModel(private val repository: Repository,
-                    private val retrofit: Retrofit) : ViewModel() {
+class MainViewModel(private val repository: Repository) : ViewModel() {
 
     private var page = 0
     private var pageSize = 20
@@ -36,7 +36,7 @@ class MainViewModel(private val repository: Repository,
         roomInput.postValue("정보를 불러오는 중...")
 
         for (id in requestIds) {
-            val apiResponse = retrofit.getRetrofitService().getName("$id")
+            val apiResponse = repository.retrofitService.getName("$id")
             apiResponse.let {
                 repository.insertFishList(Fish(id, it.name.KRko, it.price.toInt(), it.image, false))
             }
@@ -69,12 +69,6 @@ class MainViewModel(private val repository: Repository,
         viewModelScope.launch(Dispatchers.IO){
             roomInput.postValue("")
             _selectList.postValue(repository.selectPaging(pageValue + pageSize))
-        }
-    }
-
-    class Factory(private val application : Application, private val retrofit: Retrofit) : ViewModelProvider.Factory { // factory pattern
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(Repository.getInstance(application)!!,retrofit) as T
         }
     }
 

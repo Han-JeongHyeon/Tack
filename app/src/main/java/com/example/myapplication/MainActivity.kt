@@ -15,19 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.databinding.ActivityMainBinding
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private val retrofit : Retrofit by inject()
+    private val viewModel : MainViewModel by viewModel()
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
-    private val viewModel by lazy {
-        ViewModelProvider(
-            this,
-            MainViewModel.Factory(application,retrofit)
-        )[MainViewModel::class.java]
-    }
 
     private var fishAdapter: Adapter? = null
 
