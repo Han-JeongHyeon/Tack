@@ -109,4 +109,7 @@ dependencies {
     // Koin Test
     testImplementation "io.insert-koin:koin-test:3.2.0"
     testImplementation "io.insert-koin:koin-test-junit4:3.2.0"
+
+
+    implementation 'com.google.android.material:material:1.1.0'
 }

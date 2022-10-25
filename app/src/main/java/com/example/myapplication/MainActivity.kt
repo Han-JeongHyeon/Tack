@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.databinding.ActivityMainBinding
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
+
+//상단에 내가 접속한 시간 나오기
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,6 +49,8 @@ class MainActivity : AppCompatActivity() {
 
         setView()
         setObserver()
+        val aa = viewModel.dateTimeToMillSec()
+        Log.d("TAG", "$aa")
     }
 
     private fun setView() {

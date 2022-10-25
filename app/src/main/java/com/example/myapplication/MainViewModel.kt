@@ -1,10 +1,13 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 class MainViewModel(private val repository: Repository, private val retrofit: RetrofitObject) : ViewModel() {
 
@@ -19,6 +22,8 @@ class MainViewModel(private val repository: Repository, private val retrofit: Re
     var selectListObserver: LiveData<List<Fish>> = repository.selectAll()
 
     var roomInput: MutableLiveData<String> = MutableLiveData()
+
+    var timeInput: MutableLiveData<String> = MutableLiveData()
 
     fun insertFishList() = viewModelScope.launch(Dispatchers.IO) {
         pageValue = page * pageSize
@@ -66,6 +71,19 @@ class MainViewModel(private val repository: Repository, private val retrofit: Re
             withContext(Dispatchers.Main) {
                 favorite.setBackgroundResource(background)
             }
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun dateTimeToMillSec(){
+        var mDate : String? = null
+        val currentTime : Long = System.currentTimeMillis()
+        val sdf = SimpleDateFormat("HH시 mm분 ss초")
+        try {
+            mDate = sdf.format(currentTime)
+            timeInput.postValue("접속 시간 : "+mDate!!)
+        } catch (e: ParseException) {
+            e.printStackTrace()
         }
     }
 
