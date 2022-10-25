@@ -34,6 +34,6 @@ var appModule = module {
 
 var viewModule = module{
     viewModel {
-        MainViewModel( get(), get() )
+        MainViewModel( get(), get(), get() )
     }
 }

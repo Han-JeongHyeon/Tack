@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -51,6 +52,11 @@ class MainActivity : AppCompatActivity() {
 
         setView()
         setObserver()
+    }
+
+    fun intent(view : View){
+        val intent = Intent(this ,subActivity::class.java)
+        startActivity(intent)
     }
 
     private fun setView() {
