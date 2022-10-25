@@ -47,10 +47,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        viewModel.dateTimeToMillSec()
+
         setView()
         setObserver()
-        val aa = viewModel.dateTimeToMillSec()
-        Log.d("TAG", "$aa")
     }
 
     private fun setView() {

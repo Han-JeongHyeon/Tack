@@ -8,6 +8,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import kotlin.concurrent.timer
 
 class MainViewModel(private val repository: Repository, private val retrofit: RetrofitObject) : ViewModel() {
 
@@ -76,14 +77,24 @@ class MainViewModel(private val repository: Repository, private val retrofit: Re
 
     @SuppressLint("SimpleDateFormat")
     fun dateTimeToMillSec(){
-        var mDate : String? = null
-        val currentTime : Long = System.currentTimeMillis()
-        val sdf = SimpleDateFormat("HH시 mm분 ss초")
-        try {
-            mDate = sdf.format(currentTime)
-            timeInput.postValue("접속 시간 : "+mDate!!)
-        } catch (e: ParseException) {
-            e.printStackTrace()
+        viewModelScope.launch(Dispatchers.Default) {
+            var second : Int = 0
+            var min : Int = 0
+            var hour : Int = 0
+            timer(period = 1000,initialDelay = 1000)
+            {
+                if (second == 10) {
+                    min++
+                    second = 0
+                }
+                if (min == 60) {
+                    hour++
+                    min = 0
+                }
+
+                timeInput.postValue("접속 후 ${hour}시 ${min}분 ${second}초가 지났습니다")
+                second++
+            }
         }
     }
 
