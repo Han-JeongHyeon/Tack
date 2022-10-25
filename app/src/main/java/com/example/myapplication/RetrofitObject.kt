@@ -27,7 +27,6 @@ class RetrofitObject(private val context: Context) {
     }
 
     fun getRetrofitService(): Interface{
-        Log.d("TAG", "getRetrofitService")
         return getRetrofit().create(Interface::class.java)
     }
 

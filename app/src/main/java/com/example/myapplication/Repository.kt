@@ -4,12 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class Repository(private val application : Application, private val retrofit: RetrofitObject) {
-
-    val retrofitService = retrofit.getRetrofitService()
-
-    // Room Dao
-    private val fishListDao = AppDatabase.getInstance(application)!!.getFishDao()
+class Repository(private val fishListDao: Dao) {
 
     // Use Room
     fun selectAll(): LiveData<List<Fish>> {
@@ -31,4 +26,5 @@ class Repository(private val application : Application, private val retrofit: Re
     suspend fun updateFavorite(list : Fish) {
         fishListDao.updateFavorite(list)
     }
+
 }

@@ -1,15 +1,12 @@
 package com.example.myapplication
 
-import android.app.Application
-import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
-import org.koin.android.ext.android.inject
 
-class MainViewModel(private val repository: Repository) : ViewModel() {
+class MainViewModel(private val repository: Repository, private val retrofit: RetrofitObject) : ViewModel() {
 
     private var page = 0
     private var pageSize = 20
@@ -36,13 +33,20 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         roomInput.postValue("정보를 불러오는 중...")
 
         for (id in requestIds) {
-            val apiResponse = repository.retrofitService.getName("$id")
+            val apiResponse = retrofit.getRetrofitService().getName("$id")
             apiResponse.let {
                 repository.insertFishList(Fish(id, it.name.KRko, it.price.toInt(), it.image, false))
             }
         }
         getFishList()
         page++
+    }
+
+    fun getFishList(){
+        viewModelScope.launch(Dispatchers.IO){
+            roomInput.postValue("")
+            _selectList.postValue(repository.selectPaging(pageValue + pageSize))
+        }
     }
 
     fun favorite(view: View, item : Fish) {
@@ -62,13 +66,6 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
             withContext(Dispatchers.Main) {
                 favorite.setBackgroundResource(background)
             }
-        }
-    }
-
-    fun getFishList(){
-        viewModelScope.launch(Dispatchers.IO){
-            roomInput.postValue("")
-            _selectList.postValue(repository.selectPaging(pageValue + pageSize))
         }
     }
 
