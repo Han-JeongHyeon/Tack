@@ -52,17 +52,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        taskTimer = viewModel.dateTimeToMillSec()
-
         setView()
         setObserver()
     }
 
     fun intent(v : View){
-        taskTimer!!.cancel()
         val intent = Intent(this ,subActivity::class.java)
         startActivity(intent)
-        finish()
     }
 
     private fun setView() {
@@ -86,6 +82,16 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context)
             adapter = fishAdapter
         }
+    }
+
+    override fun onStart() {
+        taskTimer = viewModel.dateTimeToMillSec()
+        super.onStart()
+    }
+
+    override fun onStop() {
+        taskTimer!!.cancel()
+        super.onStop()
     }
 
     private fun setObserver() {

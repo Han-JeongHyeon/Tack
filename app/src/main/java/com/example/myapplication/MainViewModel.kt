@@ -78,13 +78,12 @@ class MainViewModel(private val context: Context, private val repository: Reposi
         }
     }
 
+    var second : Int = 0
+    var min : Int = 0
+    var hour : Int = 0
+
     @SuppressLint("SimpleDateFormat")
     fun dateTimeToMillSec(): Timer {
-        Log.d("TAG", "dateTimeToMillSec")
-        var second : Int = 0
-        var min : Int = 0
-        var hour : Int = 0
-
         val taskTimer = timer(period = 1000) {
             Log.d("TAG", "$second")
             if (second == 60) {
