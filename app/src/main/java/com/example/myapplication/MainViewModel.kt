@@ -83,23 +83,26 @@ class MainViewModel(private val context: Context, private val repository: Reposi
     var hour : Int = 0
 
     @SuppressLint("SimpleDateFormat")
-    fun dateTimeToMillSec(): Timer {
-        val taskTimer = timer(period = 1000) {
-            Log.d("TAG", "$second")
-            if (second == 60) {
-                min++
-                second = 0
-            }
-            if (min == 60) {
-                hour++
-                min = 0
-            }
+    fun dateTimeToMillSec(): Job {
+        val job = viewModelScope.launch(Dispatchers.Default) {
+            while (true) {
+                Log.d("TAG", "$second")
+                if (second == 60) {
+                    min++
+                    second = 0
+                }
+                if (min == 60) {
+                    hour++
+                    min = 0
+                }
 
-            timeInput.postValue("접속 후 ${hour}시 ${min}분 ${second}초가 지났습니다")
-            second++
+                timeInput.postValue("접속 후 ${hour}시 ${min}분 ${second}초가 지났습니다")
+                delay(1000)
+                second++
+            }
         }
 
-        return taskTimer
+        return job
 
     }
 

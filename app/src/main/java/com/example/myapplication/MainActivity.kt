@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
     private var fishAdapter: Adapter? = null
 
-    var taskTimer: Timer? = null
+    var job: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,12 +85,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
-        taskTimer = viewModel.dateTimeToMillSec()
+        job = viewModel.dateTimeToMillSec()
         super.onStart()
     }
 
     override fun onStop() {
-        taskTimer!!.cancel()
+        job!!.cancel()
         super.onStop()
     }
 
