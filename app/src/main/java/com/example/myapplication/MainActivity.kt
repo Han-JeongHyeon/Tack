@@ -15,9 +15,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.databinding.ActivityMainBinding
+import kotlinx.coroutines.Job
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
+import java.util.*
 
 //상단에 내가 접속한 시간 나오기
 
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
     private var fishAdapter: Adapter? = null
+
+    var taskTimer: Timer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,15 +52,17 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.dateTimeToMillSec()
+        taskTimer = viewModel.dateTimeToMillSec()
 
         setView()
         setObserver()
     }
 
-    fun intent(view : View){
+    fun intent(v : View){
+        taskTimer!!.cancel()
         val intent = Intent(this ,subActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     private fun setView() {

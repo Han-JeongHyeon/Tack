@@ -104,11 +104,11 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
 
 
-    implementation "io.insert-koin:koin-android:3.2.0"
+    implementation "io.insert-koin:koin-android:3.3.0"
 
     // Koin Test
-    testImplementation "io.insert-koin:koin-test:3.2.0"
-    testImplementation "io.insert-koin:koin-test-junit4:3.2.0"
+    testImplementation "io.insert-koin:koin-test:3.3.0"
+    testImplementation "io.insert-koin:koin-test-junit4:3.3.0"
 
 
     implementation 'com.google.android.material:material:1.1.0'
